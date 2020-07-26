@@ -181,5 +181,5 @@ Implements `IStocksApi` with [OptionsProfitCalculator.com](https://OptionsProfit
 
 ## Attributions
 * The TypeScript Logo is attributed to Microsoft, licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
-* The GraphQL Logo is attributed to <a href="https://commons.wikimedia.org/wiki/File:GraphQL_Logo.svg" title="via Wikimedia Commons">Facebook</a>, licensed under the <a href="http://opensource.org/licenses/bsd-license.php">BSD License</a>. Icon is not modified.
-* The icon *node-js-brands* is attributed to [FontAwesome](https://fontawesome.com), licensed under [Creative Commons Attribution 4.0 International license](https://fontawesome.com/license). Icon is not modified. Node.js is a trademark of the [OpenJS Foundation](https://openjsf.org/)
+* The GraphQL Logo is attributed to Facebook, licensed under the <a href="http://opensource.org/licenses/bsd-license.php">BSD License</a>. Icon is not modified.
+* The icon *node-js-brands* is attributed to FontAwesome, licensed under [Creative Commons Attribution 4.0 International license](https://fontawesome.com/license). Icon is not modified. Node.js is a trademark of the [OpenJS Foundation](https://openjsf.org/)

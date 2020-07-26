@@ -1,0 +1,16 @@
+interface Tradable {
+  bid: Float!
+  ask: Float!
+  last: Float!
+}
+
+type Stock implements Tradable {
+  bid: Float!
+  ask: Float!
+  last: Float!
+  symbol: String!
+}
+
+type Query {
+  stock(symbol: String!): Stock
+}

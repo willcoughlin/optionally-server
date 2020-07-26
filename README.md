@@ -175,7 +175,7 @@ Defines two market data retrieval functions for our resolvers:
 - `getStock` for getting stock price.
 - `getOptions` for getting an underlying stock's options chain.
 
-### [src/datasource/opc-stocks-api/OPCStocksApi.ts](src/datasource/opc-stocks-api/OPCStocksApi.ts)
+#### [src/datasource/opc-stocks-api/OPCStocksApi.ts](src/datasource/opc-stocks-api/OPCStocksApi.ts)
 Implements `IStocksApi` with [OptionsProfitCalculator.com](https://OptionsProfitCalculator.com) data.
 
 

@@ -1,0 +1,26 @@
+{
+  "name": "optionally-server",
+  "version": "1.0.0",
+  "description": "OptionAlly GraphQL server",
+  "main": "src/server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "npm run build:dev",
+    "build:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willcoughlin/optionally-server.git"
+  },
+  "author": "Will Coughlin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/willcoughlin/optionally-server/issues"
+  },
+  "homepage": "https://github.com/willcoughlin/optionally-server#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  }
+}

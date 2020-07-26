@@ -1,4 +1,5 @@
 import { Resolvers, OptionType } from './types';
+import IStocksApi from '../datasource/IStocksApi';
 
 const SPY_OPTIONS_CHAIN = [
   { 
@@ -18,7 +19,13 @@ const STOCKS = [
   { symbol: 'DIA', last: 264.76, bid: 264.15, ask: 264.48 }
 ];
 
-export const resolvers: Resolvers = {
+export type ResolverContext = {
+  dataSources: {
+    stocksApi: IStocksApi
+  }
+};
+
+const resolvers: Resolvers = {
   // @ts-ignore
   Tradable: {
     __resolveType: (parent) => {
@@ -29,7 +36,7 @@ export const resolvers: Resolvers = {
   },
   Query: {
   // @ts-ignore
-    stock: (_, { symbol }) => STOCKS.find(s => s.symbol == symbol.toUpperCase())
+    stock: async (_, args, context) => context.dataSources.stocksApi.getStock(args.symbol)
   }
 };
 

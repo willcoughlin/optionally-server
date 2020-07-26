@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { ResolverContext } from './resolvers';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
@@ -161,14 +162,14 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
 }>;
 
-export type TradableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Tradable'] = ResolversParentTypes['Tradable']> = ResolversObject<{
+export type TradableResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Tradable'] = ResolversParentTypes['Tradable']> = ResolversObject<{
   __resolveType: TypeResolveFn<'Stock' | 'Option', ParentType, ContextType>;
   bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 }>;
 
-export type StockResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stock'] = ResolversParentTypes['Stock']> = ResolversObject<{
+export type StockResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Stock'] = ResolversParentTypes['Stock']> = ResolversObject<{
   bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -177,7 +178,7 @@ export type StockResolvers<ContextType = any, ParentType extends ResolversParent
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type OptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Option'] = ResolversParentTypes['Option']> = ResolversObject<{
+export type OptionResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Option'] = ResolversParentTypes['Option']> = ResolversObject<{
   bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -188,18 +189,18 @@ export type OptionResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type OptionsForExpiryResolvers<ContextType = any, ParentType extends ResolversParentTypes['OptionsForExpiry'] = ResolversParentTypes['OptionsForExpiry']> = ResolversObject<{
+export type OptionsForExpiryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['OptionsForExpiry'] = ResolversParentTypes['OptionsForExpiry']> = ResolversObject<{
   expiry: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   calls: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
   puts: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+export type QueryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   stock: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
 }>;
 
-export type Resolvers<ContextType = any> = ResolversObject<{
+export type Resolvers<ContextType = ResolverContext> = ResolversObject<{
   Tradable: TradableResolvers<ContextType>;
   Stock: StockResolvers<ContextType>;
   Option: OptionResolvers<ContextType>;
@@ -212,4 +213,4 @@ export type Resolvers<ContextType = any> = ResolversObject<{
  * @deprecated
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
-export type IResolvers<ContextType = any> = Resolvers<ContextType>;
+export type IResolvers<ContextType = ResolverContext> = Resolvers<ContextType>;

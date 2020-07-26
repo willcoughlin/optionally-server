@@ -61,11 +61,13 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
         const options = optionsResponse.options;
 
         // Map options chain in OptionsProfitCalculator response format to our OptionsForExpiry type.
-        return Object.keys(options).filter(key => key != '_data_source').map((expiry): OptionsForExpiry => ({
-          expiry: expiry,
-          calls: Object.keys(options[expiry].c).map(this._getContractMapFn(expiry, symbol, options, OptionType.Call)),
-          puts: Object.keys(options[expiry].p).map(this._getContractMapFn(expiry, symbol, options, OptionType.Put))
-        }));
+        return Object.keys(options)
+          .filter(key => key != '_data_source' && options[key])
+          .map((expiry): OptionsForExpiry => ({
+            expiry: expiry,
+            calls: Object.keys(options[expiry].c).map(this._getContractMapFn(expiry, symbol, options, OptionType.Call)),
+            puts: Object.keys(options[expiry].p).map(this._getContractMapFn(expiry, symbol, options, OptionType.Put))
+          }));
       });
   }
 

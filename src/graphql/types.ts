@@ -23,7 +23,31 @@ export type Stock = Tradable & {
   ask: Scalars['Float'];
   last: Scalars['Float'];
   symbol: Scalars['String'];
+  optionsChain: Maybe<Array<OptionsForExpiry>>;
 };
+
+export type Option = Tradable & {
+  __typename?: 'Option';
+  bid: Scalars['Float'];
+  ask: Scalars['Float'];
+  last: Scalars['Float'];
+  strike: Scalars['Float'];
+  expiry: Scalars['String'];
+  type: OptionType;
+  underlying: Stock;
+};
+
+export type OptionsForExpiry = {
+  __typename?: 'OptionsForExpiry';
+  expiry: Scalars['String'];
+  calls: Array<Option>;
+  puts: Array<Option>;
+};
+
+export enum OptionType {
+  Call = 'CALL',
+  Put = 'PUT'
+}
 
 export type Query = {
   __typename?: 'Query';
@@ -114,26 +138,31 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Tradable: ResolversTypes['Stock'];
+  Tradable: ResolversTypes['Stock'] | ResolversTypes['Option'];
   Float: ResolverTypeWrapper<Scalars['Float']>;
   Stock: ResolverTypeWrapper<Stock>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Option: ResolverTypeWrapper<Option>;
+  OptionsForExpiry: ResolverTypeWrapper<OptionsForExpiry>;
+  OptionType: OptionType;
   Query: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Tradable: ResolversParentTypes['Stock'];
+  Tradable: ResolversParentTypes['Stock'] | ResolversParentTypes['Option'];
   Float: Scalars['Float'];
   Stock: Stock;
   String: Scalars['String'];
+  Option: Option;
+  OptionsForExpiry: OptionsForExpiry;
   Query: {};
   Boolean: Scalars['Boolean'];
 }>;
 
 export type TradableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Tradable'] = ResolversParentTypes['Tradable']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'Stock', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'Stock' | 'Option', ParentType, ContextType>;
   bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -144,6 +173,25 @@ export type StockResolvers<ContextType = any, ParentType extends ResolversParent
   ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   symbol: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  optionsChain: Resolver<Maybe<Array<ResolversTypes['OptionsForExpiry']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type OptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Option'] = ResolversParentTypes['Option']> = ResolversObject<{
+  bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  strike: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  expiry: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type: Resolver<ResolversTypes['OptionType'], ParentType, ContextType>;
+  underlying: Resolver<ResolversTypes['Stock'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type OptionsForExpiryResolvers<ContextType = any, ParentType extends ResolversParentTypes['OptionsForExpiry'] = ResolversParentTypes['OptionsForExpiry']> = ResolversObject<{
+  expiry: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  calls: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
+  puts: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -154,6 +202,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type Resolvers<ContextType = any> = ResolversObject<{
   Tradable: TradableResolvers<ContextType>;
   Stock: StockResolvers<ContextType>;
+  Option: OptionResolvers<ContextType>;
+  OptionsForExpiry: OptionsForExpiryResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
 }>;
 

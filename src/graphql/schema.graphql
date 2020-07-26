@@ -9,6 +9,28 @@ type Stock implements Tradable {
   ask: Float!
   last: Float!
   symbol: String!
+  optionsChain: [OptionsForExpiry!]
+}
+
+type Option implements Tradable {
+  bid: Float!
+  ask: Float!
+  last: Float!
+  strike: Float!
+  expiry: String!
+  type: OptionType!
+  underlying: Stock!
+}
+
+type OptionsForExpiry {
+  expiry: String!
+  calls: [Option!]!
+  puts: [Option!]!
+}
+
+enum OptionType {
+  CALL,
+  PUT
 }
 
 type Query {

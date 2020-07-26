@@ -4,8 +4,6 @@ export interface IOPCResponse {
   reqId: string;
 }
 
-export type OPCResponse = OPCErrorResponse | OPCStockResponse;
-
 export type OPCErrorResponse = IOPCResponse & {
   desc: string;
   data_status: number;
@@ -23,3 +21,10 @@ export type OPCStockPrice = {
   ask: number;
   _data_source: string
 };
+
+export type OPCOptionsResponse = IOPCResponse & {
+  data_status: number;
+  cached: boolean;
+  status: number;
+  options: any;
+}

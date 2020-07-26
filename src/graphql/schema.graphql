@@ -19,7 +19,7 @@ type Option implements Tradable {
   strike: Float!
   expiry: String!
   type: OptionType!
-  underlying: Stock!
+  underlyingSymbol: String!
 }
 
 type OptionsForExpiry {

@@ -300,15 +300,15 @@
             "deprecationReason": null
           },
           {
-            "name": "underlying",
+            "name": "underlyingSymbol",
             "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "Stock",
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },

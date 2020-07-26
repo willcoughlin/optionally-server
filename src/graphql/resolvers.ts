@@ -37,6 +37,10 @@ const resolvers: Resolvers = {
   Query: {
   // @ts-ignore
     stock: async (_, args, context) => context.dataSources.stocksApi.getStock(args.symbol)
+  },
+  Stock: {
+  // @ts-ignore
+    optionsChain: (parent, _, context) => context.dataSources.stocksApi.getOptions(parent.symbol)
   }
 };
 

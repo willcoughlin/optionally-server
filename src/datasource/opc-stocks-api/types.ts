@@ -1,3 +1,7 @@
+/*
+ * Types for OptionsProfitCalculator IStocksApi implementation.
+ */
+
 export interface IOPCResponse {
   status: number;
   total_time: number;

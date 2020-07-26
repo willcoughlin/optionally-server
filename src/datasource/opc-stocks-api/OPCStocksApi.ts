@@ -1,27 +1,34 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
+import { Option, OptionsForExpiry, OptionType, Stock } from '../../graphql/types';
 import IStocksApi from '../IStocksApi';
-import { Stock, OptionsForExpiry, Option, OptionType } from '../../graphql/types';
-import { OPCStockResponse, OPCErrorResponse, OPCOptionsResponse } from './types';
-import { hasUncaughtExceptionCaptureCallback } from 'process';
+import { OPCErrorResponse, OPCOptionsResponse, OPCStockResponse } from './types';
 
+/**
+ * OptionsProfitCalculator implementation of IStocksApi.
+ */
 export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
   constructor() {
     super();
     this.baseURL = 'https://www.optionsprofitcalculator.com/ajax/'
   }
 
+  /**
+   * Gets stock price info for a given symbol.
+   * @param symbol Stock symbol to look up.
+   */
   public async getStock(symbol: string) {
     return this.get<OPCStockResponse | OPCErrorResponse>(`getStockPrice?stock=${symbol}&reqId=0`)
       .then(res => {
+        // If 'desc' prop in response, we got an error
         if ('desc' in res) {
           return undefined;
         }
-
+        // If we can't cast to OPCStockResponse for some other reason, return.
         const stockResponse = res as OPCStockResponse;
         if (stockResponse == null) {
           return undefined;
         }
-
+        // Map to our Stock type
         const stock: Stock = {
           symbol: symbol.toUpperCase(),
           ask: stockResponse.price.ask,
@@ -34,13 +41,18 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
     });
   }
 
+  /**
+   * Gets options chain for an underlying symbol.
+   * @param symbol Stock symbol for underlying.
+   */
   public async getOptions(symbol: string) {
     return this.get<OPCOptionsResponse | OPCErrorResponse>(`getOptions?stock=${symbol}&reqId=1`)
       .then(res => {
+        // If 'desc' prop in response, we got an error
         if ('desc' in res) {
           return undefined;
         }
-
+        // If we can't cast to OPCOptionsResponse for some other reason, return.
         const optionsResponse = res as OPCOptionsResponse;
         if (optionsResponse == null) {
           return undefined;
@@ -48,6 +60,7 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
 
         const options = optionsResponse.options;
 
+        // Map options chain in OptionsProfitCalculator response format to our OptionsForExpiry type.
         return Object.keys(options).filter(key => key != '_data_source').map((expiry): OptionsForExpiry => ({
           expiry: expiry,
           calls: Object.keys(options[expiry].c).map(this._getContractMapFn(expiry, symbol, options, OptionType.Call)),
@@ -56,6 +69,13 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
       });
   }
 
+  /**
+   * Helper method which returns a function to map calls or puts from OptionsProfitCalculator format to our own Options type.
+   * @param expiry Expiration date from options chain.
+   * @param symbol Underlying stock symbol.
+   * @param options Options object from OptionsProfitCalculator response.
+   * @param type Call or Put.
+   */
   private _getContractMapFn(expiry: string, symbol: string, options: any, type: OptionType) {
     return (strike: string): Option => {
       const contractTypeKey = type == OptionType.Call ? 'c': 'p';

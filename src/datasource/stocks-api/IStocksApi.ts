@@ -1,4 +1,4 @@
-import { OptionsForExpiry, Stock } from "../graphql/types";
+import { OptionsForExpiry, Stock } from "../../graphql/types";
 
 /**
  * Exposes stock and option chain info retrieval functionality for stock query resolvers.

@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 import depthLimit from 'graphql-depth-limit';
 import { createServer } from 'http';
-import OPCStocksApi from './datasource/opc-stocks-api/OPCStocksApi';
+import OPCStocksApi from './datasource/stocks-api/opc/OPCStocksApi';
 import schema from './graphql/schema';
 
 // Create express app

@@ -1,5 +1,5 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
-import { Option, OptionsForExpiry, OptionType, Stock } from '../../graphql/types';
+import { Option, OptionsForExpiry, OptionType, Stock } from '../../../graphql/types';
 import IStocksApi from '../IStocksApi';
 import { OPCErrorResponse, OPCOptionsResponse, OPCStockResponse } from './types';
 

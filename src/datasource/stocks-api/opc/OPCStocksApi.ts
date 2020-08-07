@@ -7,9 +7,9 @@ import { OPCErrorResponse, OPCOptionsResponse, OPCStockResponse } from './types'
  * OptionsProfitCalculator implementation of IStocksApi.
  */
 export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
-  constructor() {
+  public constructor() {
     super();
-    this.baseURL = 'https://www.optionsprofitcalculator.com/ajax/'
+    this.baseURL = process.env.OPC_BASEURL;
   }
 
   /**
@@ -65,8 +65,8 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
           .filter(key => key != '_data_source' && options[key])
           .map((expiry): OptionsForExpiry => ({
             expiry: expiry,
-            calls: Object.keys(options[expiry].c).map(this._getContractMapFn(expiry, symbol, options, OptionType.Call)),
-            puts: Object.keys(options[expiry].p).map(this._getContractMapFn(expiry, symbol, options, OptionType.Put))
+            calls: Object.keys(options[expiry].c).map(this.getContractMapFn(expiry, symbol, options, OptionType.Call)),
+            puts: Object.keys(options[expiry].p).map(this.getContractMapFn(expiry, symbol, options, OptionType.Put))
           }));
       });
   }
@@ -78,7 +78,7 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
    * @param options Options object from OptionsProfitCalculator response.
    * @param type Call or Put.
    */
-  private _getContractMapFn(expiry: string, symbol: string, options: any, type: OptionType) {
+  private getContractMapFn(expiry: string, symbol: string, options: any, type: OptionType) {
     return (strike: string): Option => {
       const contractTypeKey = type == OptionType.Call ? 'c': 'p';
       const contract = options[expiry][contractTypeKey][strike];

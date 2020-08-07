@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import { ApolloServer } from 'apollo-server-express';
 import compression from 'compression';
 import cors from 'cors';

@@ -3,9 +3,12 @@ import IEconApi from "../IEconApi";
 import { Moment } from "moment";
 
 export default class QuandlEconApi extends RESTDataSource implements IEconApi {
-  constructor() {
+  private apiKey: string | undefined;
+
+  public constructor() {
     super();
-    this.baseURL = 'https://www.quandl.com/api/v3/datasets/';
+    this.baseURL = process.env.QUANDL_BASEURL;
+    this.apiKey = process.env.QUANDL_APIKEY;
   }
 
   public async getNearestTBillRate(target: Moment): Promise<number> {

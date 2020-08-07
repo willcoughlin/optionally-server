@@ -5,5 +5,5 @@ import { Moment } from 'moment';
  */
 export default interface IEconApi {
   getNearestTBillRate(target: Moment): Promise<number | undefined>;
-  getInflationRate(): Promise<number>;
+  getInflationRate(): Promise<number | undefined>;
 }

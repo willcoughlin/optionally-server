@@ -1,7 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import IEconApi from "../IEconApi";
 import moment, { Moment } from "moment";
-import { QuandlErrorResponse, QuandlDatasetResponse, QuandlTBillData } from "./types";
+import { QuandlErrorResponse, QuandlDatasetResponse, QuandlTBillData, QuandlInflationData } from "./types";
 
 export default class QuandlEconApi extends RESTDataSource implements IEconApi {
   private apiKey: string | undefined;
@@ -12,6 +12,10 @@ export default class QuandlEconApi extends RESTDataSource implements IEconApi {
     this.apiKey = process.env.QUANDL_APIKEY;
   }
 
+  /**
+   * Gets Treasury Bill rate for bill with maturity nearest to a given target date.
+   * @param target Target date
+   */
   public async getNearestTBillRate(target: Moment) {
     // Quandl API provides rates for these maturities in order
     const maturitiesInWeeks = [4, 13, 26, 52];
@@ -37,7 +41,24 @@ export default class QuandlEconApi extends RESTDataSource implements IEconApi {
       })
   }
 
-  public async getInflationRate(): Promise<number> {
-    return 0;
+  /**
+   * Gets current US inflation rate.
+   */
+  public async getInflationRate() {
+    return this.get<QuandlErrorResponse | QuandlDatasetResponse>(`RATEINF/INFLATION_USA.json?api_key=${this.apiKey}`)
+      .then(res => {
+        // If 'quandl_error' prop in response, we got an error
+        if ('quandl_error' in res) {
+          return undefined;
+        }
+        // Try cast
+        const datasetResponse = res as QuandlDatasetResponse;
+        if (datasetResponse == null) {
+          return undefined;
+        }
+
+        // Get rate
+        return (datasetResponse.dataset.data as QuandlInflationData)[0][1];
+      });
   }
 }

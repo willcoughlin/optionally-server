@@ -10,13 +10,11 @@ export function calculateOptionPriceForDates(option: Option, riskFreeInterestRat
   if (dates.length == 0) return [];
 
   const expiry = moment(option.expiry);
-  // TODO: get volatility from params
-  const v = 0.2;
   const optionsPrices = dates.map(d => blackScholes(
     option.last,
     option.strike,
     expiry.diff(d, 'y'),
-    v,
+    option.impliedVolatility,
     riskFreeInterestRate,
     option.type == OptionType.Call ? 'call' : 'put'
   ));

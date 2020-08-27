@@ -20,7 +20,8 @@ describe('calculateOptionPriceForDates', function() {
         last: 30,
         expiry: '2025-01-01',
         strike: 34,
-        type: OptionType.Call
+        type: OptionType.Call,
+        impliedVolatility: 0.2
       };
       const riskFreeRate = 0.1;
 
@@ -37,7 +38,8 @@ describe('calculateOptionPriceForDates', function() {
         last: 30,
         expiry: '2025-01-01',
         strike: 34,
-        type: OptionType.Call
+        type: OptionType.Call,
+        impliedVolatility: 0.2
       };
       const riskFreeRate = 0.1;
       const nowMoment = moment();

@@ -199,15 +199,15 @@ Let's run through the source code, shall we?
 ### [src/server.ts](src/server.ts)
 Here is the application entry point. It contains configuration for the Apollo and Express servers. Not much else to see here.
 
-### [src/datasource](src/datasource)
+### [src/data-source](src/data-source)
 GraphQL resolver data sources. Each subdirectory contains an Interface and current Implementation(s).
 
-#### [src/datasource/econ-api/IEconApi.ts](src/datasource/econ-api/IEconApi.ts)
+#### [src/data-source/econ-api/IEconApi.ts](src/data-source/econ-api/IEconApi.ts)
 Declares two macroeconomic data retrieval methods for option pricing:
 - `getNearestTBillRate` for getting yield for Treasury Bill with maturity nearest a given date.
 - `getInflationRate` for getting the current rate of inflation.
 
-#### [src/datasource/stocks-api/IStocksApi.ts](src/datasource/stocks-api/IStocksApi.ts)
+#### [src/data-source/stocks-api/IStocksApi.ts](src/data-source/stocks-api/IStocksApi.ts)
 Declares two market data retrieval metthods for our resolvers:
 - `getStock` for getting stock price.
 - `getOptions` for getting an underlying stock's options chain.

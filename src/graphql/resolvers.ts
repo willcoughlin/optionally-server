@@ -1,4 +1,4 @@
-import IStocksApi from '../datasource/stocks-api/IStocksApi';
+import IStocksApi from '../data-source/stocks-api/IStocksApi';
 import { Resolvers } from './types';
 
 // Lets resolvers know what's available in the context

@@ -28,12 +28,12 @@ export default class QuandlEconApi extends RESTDataSource implements IEconApi {
       .then(res => {
         // If 'quandl_error' prop in response, we got an error
         if ('quandl_error' in res) {
-          return undefined;
+          throw new Error('Could not fetch Treasury Bill rate data');
         }
         // Try cast
         const datasetResponse = res as QuandlDatasetResponse;
         if (datasetResponse == null) {
-          return undefined;
+          throw new Error('Could not fetch Treasury Bill rate data');
         }
 
         // Get rate
@@ -49,12 +49,12 @@ export default class QuandlEconApi extends RESTDataSource implements IEconApi {
       .then(res => {
         // If 'quandl_error' prop in response, we got an error
         if ('quandl_error' in res) {
-          return undefined;
+          throw new Error('Could not fetch inflation rate data');
         }
         // Try cast
         const datasetResponse = res as QuandlDatasetResponse;
         if (datasetResponse == null) {
-          return undefined;
+          throw new Error('Could not fetch inflation rate data');
         }
 
         // Get rate

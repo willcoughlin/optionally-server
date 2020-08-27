@@ -5,8 +5,8 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "jest",
-    "start:dev": "npm run build:dev",
-    "build:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
+    "build:dev": "tsc",
+    "start:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
     "generate:graphql": "graphql-codegen --config graphql-codegen.yml"
   },
   "repository": {

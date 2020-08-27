@@ -24,7 +24,7 @@ export type Stock = Tradable & {
   ask: Scalars['Float'];
   last: Scalars['Float'];
   symbol: Scalars['String'];
-  optionsChain: Maybe<Array<OptionsForExpiry>>;
+  optionsChain: Array<OptionsForExpiry>;
 };
 
 export type Option = Tradable & {
@@ -233,7 +233,7 @@ export type StockResolvers<ContextType = ResolverContext, ParentType extends Res
   ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   symbol: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  optionsChain: Resolver<Maybe<Array<ResolversTypes['OptionsForExpiry']>>, ParentType, ContextType>;
+  optionsChain: Resolver<Array<ResolversTypes['OptionsForExpiry']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 

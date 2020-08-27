@@ -10,7 +10,7 @@ type Stock implements Tradable {
   ask: Float!
   last: Float!
   symbol: String!
-  optionsChain: [OptionsForExpiry!]
+  optionsChain: [OptionsForExpiry!]!
 }
 
 type Option implements Tradable {

@@ -21,12 +21,12 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
       .then(res => {
         // If 'desc' prop in response, we got an error
         if ('desc' in res) {
-          return undefined;
+          throw new Error('Could not fetch data for underlying: ' + symbol);  
         }
         // If we can't cast to OPCStockResponse for some other reason, return.
         const stockResponse = res as OPCStockResponse;
         if (stockResponse == null) {
-          return undefined;
+          throw new Error('Could not fetch data for underlying: ' + symbol);  
         }
         // Map to our Stock type
         const stock: Stock = {
@@ -34,7 +34,7 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
           ask: stockResponse.price.ask,
           bid: stockResponse.price.bid,
           last: stockResponse.price.last,
-          optionsChain: null
+          optionsChain: []
         };
 
         return stock;
@@ -50,12 +50,12 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
       .then(res => {
         // If 'desc' prop in response, we got an error
         if ('desc' in res) {
-          return undefined;
+          throw new Error('Could not fetch options chain for underlying: ' + symbol);
         }
         // If we can't cast to OPCOptionsResponse for some other reason, return.
         const optionsResponse = res as OPCOptionsResponse;
         if (optionsResponse == null) {
-          return undefined;
+          throw new Error('Could not fetch options chain for underlying: ' + symbol);
         }
 
         const options = optionsResponse.options;

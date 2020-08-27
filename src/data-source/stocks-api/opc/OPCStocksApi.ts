@@ -89,7 +89,8 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
         ask: parseFloat(contract.a),
         last: parseFloat(contract.l),
         strike: parseFloat(strike),
-        type: type
+        type: type,
+        impliedVolatility: parseFloat(contract.v)
       };
     }
   }

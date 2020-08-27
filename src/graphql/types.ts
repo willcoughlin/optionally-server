@@ -36,6 +36,7 @@ export type Option = Tradable & {
   expiry: Scalars['String'];
   type: OptionType;
   underlyingSymbol: Scalars['String'];
+  impliedVolatility: Scalars['Float'];
 };
 
 export type OptionsForExpiry = {
@@ -245,6 +246,7 @@ export type OptionResolvers<ContextType = ResolverContext, ParentType extends Re
   expiry: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type: Resolver<ResolversTypes['OptionType'], ParentType, ContextType>;
   underlyingSymbol: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  impliedVolatility: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 

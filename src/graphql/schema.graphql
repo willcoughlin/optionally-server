@@ -21,6 +21,7 @@ type Option implements Tradable {
   expiry: String!
   type: OptionType!
   underlyingSymbol: String!
+  impliedVolatility: Float!
 }
 
 type OptionsForExpiry {

@@ -45,19 +45,67 @@ export type OptionsForExpiry = {
   puts: Array<Option>;
 };
 
+export type CalculatorResult = {
+  __typename?: 'CalculatorResult';
+  entryCost: Scalars['Float'];
+  maxRisk: Maybe<Scalars['Float']>;
+  maxReturn: Maybe<Scalars['Float']>;
+  breakEvenAtExpiry: Scalars['Float'];
+  returnsTable: Array<ReturnsForDateByStrike>;
+};
+
+export type ReturnsForDateByStrike = {
+  __typename?: 'ReturnsForDateByStrike';
+  date: Scalars['String'];
+  returnInDollars: Scalars['Float'];
+  returnInPercent: Scalars['Float'];
+};
+
 export enum OptionType {
   Call = 'CALL',
   Put = 'PUT'
 }
 
+export enum StrategyType {
+  Call = 'CALL',
+  Put = 'PUT',
+  StraddleStrangle = 'STRADDLE_STRANGLE',
+  BullCallSpread = 'BULL_CALL_SPREAD',
+  BearCallSpread = 'BEAR_CALL_SPREAD',
+  BullPutSpread = 'BULL_PUT_SPREAD',
+  BearPutSpread = 'BEAR_PUT_SPREAD',
+  IronCondor = 'IRON_CONDOR'
+}
+
+export type CalculatorInput = {
+  strategy: StrategyType;
+  longCall: Maybe<OptionInput>;
+  longPut: Maybe<OptionInput>;
+  shortCall: Maybe<OptionInput>;
+  shortPut: Maybe<OptionInput>;
+};
+
+export type OptionInput = {
+  quantity: Scalars['Int'];
+  currentPrice: Scalars['Float'];
+  strike: Scalars['Float'];
+  expiry: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
-  stock: Maybe<Stock>;
+  stock: Stock;
+  calculateReturns: CalculatorResult;
 };
 
 
 export type QueryStockArgs = {
   symbol: Scalars['String'];
+};
+
+
+export type QueryCalculateReturnsArgs = {
+  input: CalculatorInput;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -145,7 +193,13 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>;
   Option: ResolverTypeWrapper<Option>;
   OptionsForExpiry: ResolverTypeWrapper<OptionsForExpiry>;
+  CalculatorResult: ResolverTypeWrapper<CalculatorResult>;
+  ReturnsForDateByStrike: ResolverTypeWrapper<ReturnsForDateByStrike>;
   OptionType: OptionType;
+  StrategyType: StrategyType;
+  CalculatorInput: CalculatorInput;
+  OptionInput: OptionInput;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 }>;
@@ -158,6 +212,11 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   Option: Option;
   OptionsForExpiry: OptionsForExpiry;
+  CalculatorResult: CalculatorResult;
+  ReturnsForDateByStrike: ReturnsForDateByStrike;
+  CalculatorInput: CalculatorInput;
+  OptionInput: OptionInput;
+  Int: Scalars['Int'];
   Query: {};
   Boolean: Scalars['Boolean'];
 }>;
@@ -196,8 +255,25 @@ export type OptionsForExpiryResolvers<ContextType = ResolverContext, ParentType 
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
+export type CalculatorResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['CalculatorResult'] = ResolversParentTypes['CalculatorResult']> = ResolversObject<{
+  entryCost: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  maxRisk: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  maxReturn: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  breakEvenAtExpiry: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  returnsTable: Resolver<Array<ResolversTypes['ReturnsForDateByStrike']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type ReturnsForDateByStrikeResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['ReturnsForDateByStrike'] = ResolversParentTypes['ReturnsForDateByStrike']> = ResolversObject<{
+  date: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  returnInDollars: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  returnInPercent: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
 export type QueryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  stock: Resolver<Maybe<ResolversTypes['Stock']>, ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
+  stock: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
+  calculateReturns: Resolver<ResolversTypes['CalculatorResult'], ParentType, ContextType, RequireFields<QueryCalculateReturnsArgs, 'input'>>;
 }>;
 
 export type Resolvers<ContextType = ResolverContext> = ResolversObject<{
@@ -205,6 +281,8 @@ export type Resolvers<ContextType = ResolverContext> = ResolversObject<{
   Stock: StockResolvers<ContextType>;
   Option: OptionResolvers<ContextType>;
   OptionsForExpiry: OptionsForExpiryResolvers<ContextType>;
+  CalculatorResult: CalculatorResultResolvers<ContextType>;
+  ReturnsForDateByStrike: ReturnsForDateByStrikeResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
 }>;
 

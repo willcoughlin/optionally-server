@@ -1,3 +1,4 @@
+# Return types
 interface Tradable {
   bid: Float!
   ask: Float!
@@ -28,11 +29,58 @@ type OptionsForExpiry {
   puts: [Option!]!
 }
 
+type CalculatorResult {
+  entryCost: Float!,
+  maxRisk: Float 
+  maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
+  breakEvenAtExpiry: Float!,
+  returnsTable: [ReturnsForDateByStrike!]!
+}
+
+type ReturnsForDateByStrike {
+  date: String!,
+  returnInDollars: Float!,
+  returnInPercent: Float!
+}
+
+# Enums
 enum OptionType {
   CALL,
   PUT
 }
 
+enum StrategyType {
+  # Basic: Long or Short
+  CALL,
+  PUT,
+  STRADDLE_STRANGLE,
+  # Vertical spreads
+  BULL_CALL_SPREAD,
+  BEAR_CALL_SPREAD,
+  BULL_PUT_SPREAD,
+  BEAR_PUT_SPREAD,
+  # Other
+  IRON_CONDOR
+}
+
+# Query inputs
+input CalculatorInput {
+  strategy: StrategyType!,
+  longCall: OptionInput,
+  longPut: OptionInput,
+  shortCall: OptionInput,
+  shortPut: OptionInput
+}
+
+input OptionInput {
+  quantity: Int!,
+  currentPrice: Float!,
+  strike: Float!,
+  expiry: String!
+}
+
+# Queries
 type Query {
-  stock(symbol: String!): Stock
+  stock(symbol: String!): Stock!
+  calculateReturns(input: CalculatorInput!) : CalculatorResult!
 }

@@ -6,7 +6,9 @@ export function calculateApproximateRiskFreeInterestRate(tBillRate: number, infl
   return tBillRate + inflationRate;
 }
 
-export function calculateOptionPriceForDates(option: Option, volatility: number, riskFreeInterestRate: number, dates: Moment[]) {
+export function calculateOptionPriceForDates(option: Option, riskFreeInterestRate: number, dates: Moment[]) {
+  if (dates.length == 0) return [];
+
   const expiry = moment(option.expiry);
   // TODO: get volatility from params
   const v = 0.2;

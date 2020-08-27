@@ -1,5 +1,7 @@
 import IStocksApi from '../data-source/stocks-api/IStocksApi';
-import { Resolvers } from './types';
+import { Resolvers, CalculatorInput } from './types';
+import { calculateMaxRiskAndReturn, calclateEntryCost } from '../util/return-calculator';
+import { GQLSafeNumber } from '../util/types';
 
 // Lets resolvers know what's available in the context
 export type ResolverContext = {
@@ -8,12 +10,20 @@ export type ResolverContext = {
   }
 };
 
-
 const resolvers: Resolvers = {
   // Query resolvers
   Query: {
     stock: async (_, args, context) => context.dataSources.stocksApi.getStock(args.symbol),
-    calculateReturns: () => { throw new Error("Not Implemented"); }
+    calculateReturns: (_, args, context, resolveInfo) => {
+      const maxRiskAndReturn = calculateMaxRiskAndReturn(args.input);
+      return {
+        breakEvenAtExpiry: 0,
+        entryCost: calclateEntryCost(args.input),
+        maxRisk: maxRiskAndReturn[0],
+        maxReturn: maxRiskAndReturn[1],
+        returnsTable: []
+      };  
+    }
   },
   // @ts-ignore
   Stock: {

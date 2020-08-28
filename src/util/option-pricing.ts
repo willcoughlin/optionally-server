@@ -11,7 +11,7 @@ export function calculateOptionPriceForDates(option: Option, riskFreeInterestRat
 
   const expiry = moment(option.expiry);
   const optionsPrices = dates.map(d => blackScholes(
-    option.last,
+    option.underlyingPrice,
     option.strike,
     expiry.diff(d, 'y'),
     option.impliedVolatility,

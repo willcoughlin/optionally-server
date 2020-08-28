@@ -1,6 +1,6 @@
-import * as optionPricing from './option-pricing';
+import moment from 'moment';
 import { Option, OptionType } from '../graphql/types';
-import moment, { Moment } from 'moment';
+import * as optionPricing from './option-pricing';
 
 describe('calculateApproximateRiskFreeInterestRate', function () {
 it('adds its inputs', function () {
@@ -15,6 +15,7 @@ describe('calculateOptionPriceForDates', function() {
     it('returns empty array when dates input is empty', function () {
       const option: Option = {
         underlyingSymbol: 'TEST',
+        underlyingPrice: 40,
         ask: 31,
         bid: 29,
         last: 30,
@@ -33,6 +34,7 @@ describe('calculateOptionPriceForDates', function() {
     it('returns array of same length as dates input', function () {
       const option: Option = {
         underlyingSymbol: 'TEST',
+        underlyingPrice: 40,
         ask: 31,
         bid: 29,
         last: 30,

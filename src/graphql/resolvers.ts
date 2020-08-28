@@ -1,7 +1,6 @@
 import IStocksApi from '../data-source/stocks-api/IStocksApi';
-import { Resolvers, CalculatorInput } from './types';
-import { calculateMaxRiskAndReturn, calclateEntryCost } from '../util/return-calculator';
-import { GQLSafeNumber } from '../util/types';
+import { calclateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
+import { Resolvers } from './types';
 
 // Lets resolvers know what's available in the context
 export type ResolverContext = {
@@ -14,7 +13,7 @@ const resolvers: Resolvers = {
   // Query resolvers
   Query: {
     stock: async (_, args, context) => context.dataSources.stocksApi.getStock(args.symbol),
-    calculateReturns: (_, args, context, resolveInfo) => {
+    calculateReturns: (_, args) => {
       const maxRiskAndReturn = calculateMaxRiskAndReturn(args.input);
       return {
         breakEvenAtExpiry: 0,
@@ -28,7 +27,7 @@ const resolvers: Resolvers = {
   // @ts-ignore
   Stock: {
     // Use a resolver specifically for optionsChain field since it requires an API call.
-    optionsChain: (parent, _, context) => context.dataSources.stocksApi.getOptions(parent.symbol)
+    optionsChain: (parent, _, context) => context.dataSources.stocksApi.getOptions(parent)
   },
   // @ts-ignore
   Tradable: {

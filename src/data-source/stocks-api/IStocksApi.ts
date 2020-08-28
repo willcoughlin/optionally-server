@@ -5,5 +5,5 @@ import { OptionsForExpiry, Stock } from "../../graphql/types";
  */
 export default interface IStocksApi {
   getStock(symbol: string): Promise<Stock>;
-  getOptions(symbol: string): Promise<OptionsForExpiry[]>;
+  getOptions(underlying: Stock): Promise<OptionsForExpiry[]>;
 }

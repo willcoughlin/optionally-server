@@ -3,8 +3,8 @@ import { GQLSafeNumber } from "./types";
 
 /**
  * Calculates entry cost (or credit) of a given input.
- * @param input input of type CalculatorInput
- * @returns entry cost or credit as a number
+ * @param input Calculator input.
+ * @returns Entry cost or credit as a number.
  */
 export function calclateEntryCost(input: CalculatorInput) {
   switch (input.strategy) {
@@ -36,8 +36,8 @@ export function calclateEntryCost(input: CalculatorInput) {
 
 /**
  * Calculates maximum risk and maximum return
- * @param input input of type CalculatorInput
- * @returns a tuple of [maxRisk, maxReward]
+ * @param input Calculator input.
+ * @returns A tuple of [maxRisk, maxReward].
  */
 export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumber, GQLSafeNumber] {
   switch (input.strategy) {

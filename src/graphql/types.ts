@@ -50,8 +50,8 @@ export type OptionsForExpiry = {
 export type CalculatorResult = {
   __typename?: 'CalculatorResult';
   entryCost: Scalars['Float'];
-  maxRisk: Maybe<Scalars['Float']>;
-  maxReturn: Maybe<Scalars['Float']>;
+  maxRisk?: Maybe<Scalars['Float']>;
+  maxReturn?: Maybe<Scalars['Float']>;
   breakEvenAtExpiry: Scalars['Float'];
   returnsTable: Array<ReturnsForDateByStrike>;
 };
@@ -81,10 +81,10 @@ export enum StrategyType {
 
 export type CalculatorInput = {
   strategy: StrategyType;
-  longCall: Maybe<OptionInput>;
-  longPut: Maybe<OptionInput>;
-  shortCall: Maybe<OptionInput>;
-  shortPut: Maybe<OptionInput>;
+  longCall?: Maybe<OptionInput>;
+  longPut?: Maybe<OptionInput>;
+  shortCall?: Maybe<OptionInput>;
+  shortPut?: Maybe<OptionInput>;
 };
 
 export type OptionInput = {
@@ -225,69 +225,69 @@ export type ResolversParentTypes = ResolversObject<{
 
 export type TradableResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Tradable'] = ResolversParentTypes['Tradable']> = ResolversObject<{
   __resolveType: TypeResolveFn<'Stock' | 'Option', ParentType, ContextType>;
-  bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  bid?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  ask?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  last?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 }>;
 
 export type StockResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Stock'] = ResolversParentTypes['Stock']> = ResolversObject<{
-  bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  symbol: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  optionsChain: Resolver<Array<ResolversTypes['OptionsForExpiry']>, ParentType, ContextType>;
+  bid?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  ask?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  last?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  optionsChain?: Resolver<Array<ResolversTypes['OptionsForExpiry']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export type OptionResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Option'] = ResolversParentTypes['Option']> = ResolversObject<{
-  bid: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  ask: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  last: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  strike: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  expiry: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  type: Resolver<ResolversTypes['OptionType'], ParentType, ContextType>;
-  underlyingSymbol: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  underlyingPrice: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  impliedVolatility: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  bid?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  ask?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  last?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  strike?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  expiry?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['OptionType'], ParentType, ContextType>;
+  underlyingSymbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  underlyingPrice?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  impliedVolatility?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export type OptionsForExpiryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['OptionsForExpiry'] = ResolversParentTypes['OptionsForExpiry']> = ResolversObject<{
-  expiry: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  calls: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
-  puts: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
+  expiry?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  calls?: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
+  puts?: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export type CalculatorResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['CalculatorResult'] = ResolversParentTypes['CalculatorResult']> = ResolversObject<{
-  entryCost: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  maxRisk: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  maxReturn: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  breakEvenAtExpiry: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  returnsTable: Resolver<Array<ResolversTypes['ReturnsForDateByStrike']>, ParentType, ContextType>;
+  entryCost?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  maxRisk?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  maxReturn?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  breakEvenAtExpiry?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  returnsTable?: Resolver<Array<ResolversTypes['ReturnsForDateByStrike']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export type ReturnsForDateByStrikeResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['ReturnsForDateByStrike'] = ResolversParentTypes['ReturnsForDateByStrike']> = ResolversObject<{
-  date: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  returnInDollars: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  returnInPercent: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  returnInDollars?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  returnInPercent?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export type QueryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  stock: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
-  calculateReturns: Resolver<ResolversTypes['CalculatorResult'], ParentType, ContextType, RequireFields<QueryCalculateReturnsArgs, 'input'>>;
+  stock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
+  calculateReturns?: Resolver<ResolversTypes['CalculatorResult'], ParentType, ContextType, RequireFields<QueryCalculateReturnsArgs, 'input'>>;
 }>;
 
 export type Resolvers<ContextType = ResolverContext> = ResolversObject<{
-  Tradable: TradableResolvers<ContextType>;
-  Stock: StockResolvers<ContextType>;
-  Option: OptionResolvers<ContextType>;
-  OptionsForExpiry: OptionsForExpiryResolvers<ContextType>;
-  CalculatorResult: CalculatorResultResolvers<ContextType>;
-  ReturnsForDateByStrike: ReturnsForDateByStrikeResolvers<ContextType>;
-  Query: QueryResolvers<ContextType>;
+  Tradable?: TradableResolvers<ContextType>;
+  Stock?: StockResolvers<ContextType>;
+  Option?: OptionResolvers<ContextType>;
+  OptionsForExpiry?: OptionsForExpiryResolvers<ContextType>;
+  CalculatorResult?: CalculatorResultResolvers<ContextType>;
+  ReturnsForDateByStrike?: ReturnsForDateByStrikeResolvers<ContextType>;
+  Query?: QueryResolvers<ContextType>;
 }>;
 
 

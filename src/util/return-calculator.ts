@@ -7,31 +7,59 @@ import { GQLSafeNumber } from "./types";
  * @returns Entry cost or credit as a number.
  */
 export function calclateEntryCost(input: CalculatorInput) {
+  let entryCost = 100;  // Standard 100x contract multiplier
+  const getContractCost = (price: number, quantity: number) => price * quantity;
+
   switch (input.strategy) {
-    case StrategyType.Call:
-      if (input.longCall)
-        return input.longCall.currentPrice;
-      if (input.shortCall)
-        return -input.shortCall.currentPrice;
-      throw new Error('longCall or shortCall must be defined for StrategyType.Call');
-      
-    case StrategyType.Put:
-      if (input.longPut)
-        return input.longPut.currentPrice;
-      if (input.shortPut)
-        return -input.shortPut.currentPrice;
-      throw new Error('longPut or shortPut must be defined for StrategyType.Put');
-    
-    case StrategyType.StraddleStrangle:
-      if (input.longCall && input.longPut)
-        return input.longCall.currentPrice + input.longPut.currentPrice;
-      if (input.shortCall && input.shortPut)
-        return -input.shortCall.currentPrice - input.shortPut.currentPrice;
-      throw new Error('Both longCall and longPut or shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
+    case StrategyType.Call: {
+      // Determine whether to use long or short
+      const callInput = input.longCall ?? input.shortCall;
+      if (!callInput)
+        throw new Error('longCall or shortCall must be defined for StrategyType.Call');
+
+      let contractCost = getContractCost(callInput.currentPrice, callInput.quantity);
+      if (callInput === input.shortCall)
+        contractCost *= -1;  // Credit if short
+      entryCost *= contractCost;
+      break;
+    }
+    case StrategyType.Put: {
+      const putInput = input.longPut ?? input.shortPut;
+      if (!putInput)
+        throw new Error('longPut or shortPut must be defined for StrategyType.Put');
+
+      let contractCost = getContractCost(putInput.currentPrice, putInput.quantity);
+      if (putInput === input.shortPut)
+        contractCost *= -1;
+      entryCost *= contractCost;
+      break;
+    }
+    case StrategyType.StraddleStrangle: {
+      // Determine whether to use long or short call and put
+      const callInput = input.longCall ?? input.shortCall;
+      const putInput = input.longPut ?? input.shortPut;
+      if (!callInput || !putInput)
+        throw new Error('Both longCall and longPut or shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
+
+      let callContractCost = getContractCost(callInput.currentPrice, callInput.quantity);
+      let putContactCost = getContractCost(putInput.currentPrice, putInput.quantity); 
+      // Credit if short
+      if (callInput === input.shortCall)
+        callContractCost *= -1;
+      if (putInput === input.shortPut)
+        putContactCost *= -1;
+
+      if (callContractCost * putContactCost < 0)
+        throw new Error('Call and put must both be long or short for StrategyType.StraddleStrangle');
+
+      entryCost *= callContractCost + putContactCost;
+      break;
+    }
 
     default:
       throw new Error('Not implemented');
   }
+  return entryCost;
 }
 
 /**

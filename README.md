@@ -1,4 +1,6 @@
 # OptionAlly Server
+![test workflow badge](https://github.com/willcoughlin/optionally-server/workflows/Tests/badge.svg)
+
 ## Contents
 * [Description](#description)
 * [Technologies](#technologies)

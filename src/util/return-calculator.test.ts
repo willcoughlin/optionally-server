@@ -1,18 +1,18 @@
 import * as returnCalculator from './return-calculator'
 import { CalculatorInput, OptionInput, StrategyType } from '../graphql/types';
 
-describe('calclateEntryCost', function () {
-  let testOption: OptionInput;
-  
-  beforeEach(function() {
-    testOption = {
-      currentPrice: 0.1,
-      expiry: '2020-01-15',
-      quantity: 1,
-      strike: 50
-    };
-  });
+let testOption: OptionInput;
 
+beforeEach(function() {
+  testOption = {
+    currentPrice: 0.1,
+    expiry: '2020-01-15',
+    quantity: 1,
+    strike: 50
+  };
+});
+
+describe('calclateEntryCost', function () {
   describe('with call option strategy', function () {
     it('returns call contract price multiplied by 100', function () {
       const calculatorInput: CalculatorInput = {
@@ -250,6 +250,82 @@ describe('calclateEntryCost', function () {
       };
       const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
+    });
+  });
+});
+
+describe('calculateMaxRiskAndReturn', function () {
+  describe('with call or put strategy', function () {
+    it('returns entry cost as max risk and infinite max reward when long', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.Call,
+        longCall: testOption
+      };
+      const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toEqual(10);
+      expect(maxReturn).toBeNull();
+    });
+    it('returns entry cost as max reward and infinite max risk when short', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.Call,
+        shortCall: testOption
+      };
+      const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toBeNull();
+      expect(maxReturn).toEqual(-10);
+    });
+    it('throws error when call or put not defined', function () {
+      const calculatorInput: CalculatorInput = { strategy: StrategyType.Call };
+      const tryGetResult = () => returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(tryGetResult).toThrow();  
+    });
+  });
+  describe('with debit spread strategy', function () {
+    it('returns entry cost as max risk and calculates max reward based on strikes', function () {
+      const longCall = Object.assign({}, testOption);
+      const shortCall = Object.assign({}, testOption);
+      longCall.currentPrice *= 2;
+      shortCall.strike += 5;
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.BullCallSpread,
+        longCall,
+        shortCall
+      };
+      const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toEqual(10);  // cost of entry
+      expect(maxReturn).toEqual(490);  // strike diff (500) - cost of entry
+    });
+    it ('throws error when one leg not defined', function () {
+      const calculatorInput: CalculatorInput = { 
+        strategy: StrategyType.BullCallSpread,
+        longCall: testOption
+      };
+      const tryGetResult = () => returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(tryGetResult).toThrow();  
+    });
+  });
+  describe('with credit spread strategy', function () {
+    it('returns entry cost as max reward and calculates max risk based on strikes', function () {
+      const longCall = Object.assign({}, testOption);
+      const shortCall = Object.assign({}, testOption);
+      shortCall.currentPrice *= 2;
+      longCall.strike += 5;
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.BearCallSpread,
+        longCall,
+        shortCall
+      };
+      const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toEqual(490);  // strike diff (500) + cost of entry
+      expect(maxReturn).toEqual(-10);  // cost of entry
+    });
+    it ('throws error when one leg not defined', function () {
+      const calculatorInput: CalculatorInput = { 
+        strategy: StrategyType.BearCallSpread,
+        shortCall: testOption
+      };
+      const tryGetResult = () => returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(tryGetResult).toThrow();  
     });
   });
 });

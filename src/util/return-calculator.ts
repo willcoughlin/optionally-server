@@ -104,7 +104,7 @@ export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumbe
       const strikePriceDifference = input.strategy === StrategyType.BearCallSpread 
         ? (input.longCall?.strike ?? 0) - (input.shortCall?.strike ?? 0)
         : (input.shortPut?.strike ?? 0) - (input.longPut?.strike ?? 0);
-      return [strikePriceDifference * 100 - entryCost, entryCost];
+      return [strikePriceDifference * 100 + entryCost, entryCost];
     }
     default:
       throw new Error('Not implemented');

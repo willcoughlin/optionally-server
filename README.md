@@ -88,6 +88,8 @@ type Option implements Tradable {
   expiry: String!
   type: OptionType!  # CALL or PUT
   underlyingSymbol: String!
+  underlyingPrice: Float!
+  impliedVolatility: Float!
 }
 
 type OptionsForExpiry {
@@ -234,6 +236,9 @@ General utlity modules.
 
 #### [src/util/option-pricing.ts](src/util/option-pricing.ts)
 Of note here is the function `calculateOptionPriceForDates`, used to calculate theoretical option prices on each date in a given list of dates. OptionAlly uses the Black-Scholes option pricing model.
+
+#### [src/util/return-calculator.ts](src/util/return-calculator.ts)
+This module provides functions that do the work of calculating the results of a CalclulatorInput, including max risk and max return.
 
 ## Attributions
 * The TypeScript Logo is attributed to Microsoft, licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).

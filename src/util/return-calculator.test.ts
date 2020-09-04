@@ -1,5 +1,5 @@
-import * as returnCalculator from './return-calculator'
 import { CalculatorInput, OptionInput, StrategyType } from '../graphql/types';
+import * as returnCalculator from './return-calculator';
 
 let testOption: OptionInput;
 
@@ -272,7 +272,7 @@ describe('calculateMaxRiskAndReturn', function () {
       };
       const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
       expect(maxRisk).toBeNull();
-      expect(maxReturn).toEqual(-10);
+      expect(maxReturn).toEqual(10);
     });
     it('throws error when call or put not defined', function () {
       const calculatorInput: CalculatorInput = { strategy: StrategyType.Call };
@@ -317,7 +317,7 @@ describe('calculateMaxRiskAndReturn', function () {
       };
       const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
       expect(maxRisk).toEqual(490);  // strike diff (500) + cost of entry
-      expect(maxReturn).toEqual(-10);  // cost of entry
+      expect(maxReturn).toEqual(10);  // cost of entry
     });
     it ('throws error when one leg not defined', function () {
       const calculatorInput: CalculatorInput = { 
@@ -326,6 +326,129 @@ describe('calculateMaxRiskAndReturn', function () {
       };
       const tryGetResult = () => returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
       expect(tryGetResult).toThrow();  
+    });
+  });
+  describe('with iron condor strategy', function () {
+    it('returns entry cost as max reward and calculates max risk based on strikes', function () {
+      const longCall = Object.assign({}, testOption);
+      const shortCall = Object.assign({}, testOption);
+      const shortPut = Object.assign({}, testOption);
+      const longPut = Object.assign({}, testOption);
+      // Call credit spread cost of entry: (0.3 - 0.5) * 100 = -20
+      longCall.currentPrice = 0.3;
+      shortCall.currentPrice = 0.5;
+      // Put credit spread cost of entry: (0.3 - 0.5) * 100 = = -20 
+      shortPut.currentPrice = 0.5;
+      longPut.currentPrice = 0.3;
+      longCall.strike += 7;
+      shortCall.strike += 6;
+      shortPut.strike -= 6;
+      longPut.strike -= 7;
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.IronCondor,
+        longCall,
+        shortCall,
+        shortPut,
+        longPut
+      };
+      const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toEqual(60);
+      expect(maxReturn).toEqual(40);
+    });
+    it('uses max strike difference to determine max risk', function () {
+      const longCall = Object.assign({}, testOption);
+      const shortCall = Object.assign({}, testOption);
+      const shortPut = Object.assign({}, testOption);
+      const longPut = Object.assign({}, testOption);
+      // Call credit spread cost of entry:-30
+      longCall.currentPrice = 0.2;
+      shortCall.currentPrice = 0.5;
+      // Put credit spread cost of entry: -20
+      shortPut.currentPrice = 0.5;
+      longPut.currentPrice = 0.3;
+      // Call strike diff: 2
+      longCall.strike += 8;
+      shortCall.strike += 6;
+      shortPut.strike -= 6;
+      longPut.strike -= 7;
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.IronCondor,
+        longCall,
+        shortCall,
+        shortPut,
+        longPut
+      };
+      const [maxRisk, _] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toEqual(150);  // 100*(8 - 6) - 50
+    });
+    it('swaps max risk and max return when long iron condor', function () {
+      const longCall = Object.assign({}, testOption);
+      const shortCall = Object.assign({}, testOption);
+      const shortPut = Object.assign({}, testOption);
+      const longPut = Object.assign({}, testOption);
+      // Call debit spread cost of entry: (0.5 - 0.3) * 100 = 20
+      shortCall.currentPrice = 0.3;
+      longCall.currentPrice = 0.5;
+      // Put credit spread cost of entry: (0.5 - 0.3) * 100 = = 20 
+      longPut.currentPrice = 0.5;
+      shortPut.currentPrice = 0.3;
+      shortCall.strike += 7;
+      longCall.strike += 6;
+      longPut.strike -= 6;
+      shortPut.strike -= 7;
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.IronCondor,
+        longCall,
+        shortCall,
+        shortPut,
+        longPut
+      };
+      const [maxRisk, maxReturn] = returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(maxRisk).toEqual(40);
+      expect(maxReturn).toEqual(60);
+    });
+    it ('throws error when one leg not defined', function () {
+      const calculatorInput: CalculatorInput = { 
+        strategy: StrategyType.IronCondor,
+        longCall: testOption,
+        shortCall: testOption,
+        shortPut: testOption
+      };
+      const tryGetResult = () => returnCalculator.calculateMaxRiskAndReturn(calculatorInput);
+      expect(tryGetResult).toThrow();  
+    });
+  });
+});
+
+describe('calculateBreakevenAtExpiry', function () {
+  describe('with call strategy', function () {
+    it('returns strike price plus contract price', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.Call,
+        longCall: testOption
+      };
+      const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(result).toEqual(50.1);
+    });
+    it('throws error when call leg not defined', function () {
+      const calculatorInput: CalculatorInput = { strategy: StrategyType.Call };
+      const tryGetResult = () => returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(tryGetResult).toThrow();
+    });
+  });
+  describe('with put strategy', function () {
+    it('returns strike price minus contract price', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.Put,
+        longPut: testOption
+      };
+      const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(result).toEqual(49.9);
+    });
+    it('throws error when put leg not defined', function () {
+      const calculatorInput: CalculatorInput = { strategy: StrategyType.Put };
+      const tryGetResult = () => returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(tryGetResult).toThrow();
     });
   });
 });

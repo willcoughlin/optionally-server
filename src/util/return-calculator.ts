@@ -1,6 +1,5 @@
-import { CalculatorInput, StrategyType, OptionInput } from "../graphql/types";
+import { CalculatorInput, OptionInput, StrategyType } from "../graphql/types";
 import { GQLSafeNumber } from "./types";
-import { validate } from "graphql";
 
 /**
  * Calculates entry cost (or credit) of a given input.
@@ -87,7 +86,7 @@ export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumbe
     case StrategyType.StraddleStrangle: {
       const entryCost = calculateEntryCost(input);
       if (entryCost < 0)
-        return [null, entryCost];
+        return [null, -entryCost];
       return [entryCost, null];
     }
     case StrategyType.BullCallSpread:
@@ -104,11 +103,42 @@ export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumbe
       const strikePriceDifference = input.strategy === StrategyType.BearCallSpread 
         ? (input.longCall?.strike ?? 0) - (input.shortCall?.strike ?? 0)
         : (input.shortPut?.strike ?? 0) - (input.longPut?.strike ?? 0);
-      return [strikePriceDifference * 100 + entryCost, entryCost];
+      return [strikePriceDifference * 100 + entryCost, -entryCost];
     }
     case StrategyType.IronCondor: {
       const entryCost = calculateEntryCost(input);
+      const callStrikeDifference = Math.abs((input.longCall?.strike ?? 0) - (input.shortCall?.strike ?? 0));
+      const putStrikeDifference = Math.abs((input.longPut?.strike ?? 0) - (input.shortPut?.strike ?? 0));
+      const maxStrikeDifference =  Math.max(callStrikeDifference, putStrikeDifference);
+      if (entryCost < 0) 
+        return [maxStrikeDifference * 100 + entryCost, -entryCost];
+      return [entryCost, maxStrikeDifference * 100 - entryCost];
     }
+    default:
+      throw new Error('Not implemented');
+  }
+}
+
+/**
+ * Calculates breakeven point of underlying stock at expiry.
+ * @param input Calculator input.
+ * @returns Breakeven underlying stock price.
+ */
+export function calculateBreakevenAtExpiry(input: CalculatorInput) {
+  switch (input.strategy) {
+    case StrategyType.Call:
+    case StrategyType.Put: {
+      const callToUse = input.longCall ?? input.shortCall;
+      const putToUse = input.longPut ?? input.shortPut;
+      if (callToUse)
+        return callToUse.strike + callToUse.currentPrice;
+      if (putToUse)
+        return putToUse.strike - putToUse.currentPrice;
+      const isCall = input.strategy === StrategyType.Call;
+      throw new Error(`${isCall ? 'longCall or shortCall' : 'longPut or shortPut'} must be defined for StrategyType.`
+        + (isCall ? 'Call' : 'Put')); 
+    }
+    
     default:
       throw new Error('Not implemented');
   }

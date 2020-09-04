@@ -12,14 +12,14 @@ beforeEach(function() {
   };
 });
 
-describe('calclateEntryCost', function () {
+describe('calculateEntryCost', function () {
   describe('with call option strategy', function () {
     it('returns call contract price multiplied by 100', function () {
       const calculatorInput: CalculatorInput = {
         strategy: StrategyType.Call,
         longCall: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(10);
     });
 
@@ -29,7 +29,7 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.Call,
         longCall: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(50);
     });
 
@@ -38,13 +38,13 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.Call,
         shortCall: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(-10);
     });
 
     it('throws error if no long call or short call defined', function () {
       const calculatorInput: CalculatorInput = { strategy: StrategyType.Call };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
   });
@@ -55,7 +55,7 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.Put,
         longPut: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(10);
     });
 
@@ -65,7 +65,7 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.Put,
         longPut: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(50);
     });
 
@@ -74,13 +74,13 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.Put,
         shortPut: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(-10);
     });
 
     it('throws error if no long put or short put defined', function () {
       const calculatorInput: CalculatorInput = { strategy: StrategyType.Put };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
   });
@@ -92,7 +92,7 @@ describe('calclateEntryCost', function () {
         longCall: testOption,
         longPut: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(20);
     });
 
@@ -102,13 +102,13 @@ describe('calclateEntryCost', function () {
         shortCall: testOption,
         shortPut: testOption
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(-20);
     });
 
     it('throws error if no shorts or longs defined', function () {
       const calculatorInput: CalculatorInput = { strategy: StrategyType.StraddleStrangle };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
 
@@ -117,7 +117,7 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.StraddleStrangle,
         longCall: testOption
       };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
 
@@ -127,7 +127,7 @@ describe('calclateEntryCost', function () {
         longCall: testOption,
         shortCall: testOption
       };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
 
@@ -136,7 +136,7 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.StraddleStrangle,
         longPut: testOption
       };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
 
@@ -146,7 +146,7 @@ describe('calclateEntryCost', function () {
         longPut: testOption,
         shortPut: testOption
       };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
   });
@@ -161,7 +161,7 @@ describe('calclateEntryCost', function () {
         longCall,
         shortCall
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(10);
     });
 
@@ -174,7 +174,7 @@ describe('calclateEntryCost', function () {
         longCall,
         shortCall
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(-10);
     });
 
@@ -189,7 +189,7 @@ describe('calclateEntryCost', function () {
         longCall,
         shortCall
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(20);
     });
 
@@ -199,7 +199,7 @@ describe('calclateEntryCost', function () {
         strategy: StrategyType.BullCallSpread,
         longCall
       };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
   });
@@ -219,7 +219,7 @@ describe('calclateEntryCost', function () {
         longPut, 
         shortPut
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(-20);
     });
 
@@ -237,7 +237,7 @@ describe('calclateEntryCost', function () {
         longPut, 
         shortPut
       };
-      const entryCost = returnCalculator.calclateEntryCost(calculatorInput);
+      const entryCost = returnCalculator.calculateEntryCost(calculatorInput);
       expect(entryCost).toEqual(20);
     });
 
@@ -248,7 +248,7 @@ describe('calclateEntryCost', function () {
         shortCall: testOption,
         longPut: testOption
       };
-      const tryGetResult = () => returnCalculator.calclateEntryCost(calculatorInput);
+      const tryGetResult = () => returnCalculator.calculateEntryCost(calculatorInput);
       expect(tryGetResult).toThrow();
     });
   });

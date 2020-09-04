@@ -7,7 +7,7 @@ import { validate } from "graphql";
  * @param input Calculator input.
  * @returns Entry cost or credit as a number.
  */
-export function calclateEntryCost(input: CalculatorInput) {
+export function calculateEntryCost(input: CalculatorInput) {
   let entryCost = 100;  // Standard 100x contract multiplier
   const getContractCost = (price: number, quantity: number) => price * quantity;
 
@@ -85,14 +85,14 @@ export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumbe
     case StrategyType.Call:
     case StrategyType.Put:
     case StrategyType.StraddleStrangle: {
-      const entryCost = calclateEntryCost(input);
+      const entryCost = calculateEntryCost(input);
       if (entryCost < 0)
         return [null, entryCost];
       return [entryCost, null];
     }
     case StrategyType.BullCallSpread:
     case StrategyType.BearPutSpread: {
-      const entryCost = calclateEntryCost(input);
+      const entryCost = calculateEntryCost(input);
       const strikePriceDifference = input.strategy === StrategyType.BullCallSpread 
         ? (input.shortCall?.strike ?? 0) - (input.longCall?.strike ?? 0)
         : (input.longPut?.strike ?? 0) - (input.shortPut?.strike ?? 0);
@@ -100,11 +100,14 @@ export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumbe
     }
     case StrategyType.BearCallSpread:
     case StrategyType.BullPutSpread: {
-      const entryCost = calclateEntryCost(input);
+      const entryCost = calculateEntryCost(input);
       const strikePriceDifference = input.strategy === StrategyType.BearCallSpread 
         ? (input.longCall?.strike ?? 0) - (input.shortCall?.strike ?? 0)
         : (input.shortPut?.strike ?? 0) - (input.longPut?.strike ?? 0);
       return [strikePriceDifference * 100 + entryCost, entryCost];
+    }
+    case StrategyType.IronCondor: {
+      const entryCost = calculateEntryCost(input);
     }
     default:
       throw new Error('Not implemented');

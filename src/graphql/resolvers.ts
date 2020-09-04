@@ -1,5 +1,5 @@
 import IStocksApi from '../data-source/stocks-api/IStocksApi';
-import { calclateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
+import { calculateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
 import { Resolvers } from './types';
 
 // Lets resolvers know what's available in the context
@@ -17,7 +17,7 @@ const resolvers: Resolvers = {
       const maxRiskAndReturn = calculateMaxRiskAndReturn(args.input);
       return {
         breakEvenAtExpiry: 0,
-        entryCost: calclateEntryCost(args.input),
+        entryCost: calculateEntryCost(args.input),
         maxRisk: maxRiskAndReturn[0],
         maxReturn: maxRiskAndReturn[1],
         returnsTable: []

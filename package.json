@@ -7,7 +7,11 @@
     "test": "jest",
     "build": "tsc && copyfiles && copyfiles -u 2 src/graphql/*.graphql dist/graphql/",
     "start:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
-    "generate:graphql": "graphql-codegen --config graphql-codegen.yml"
+    "graphql-codegen": "graphql-codegen --config graphql-codegen.yml",
+    "docker-build:dev": "docker build -t optionally-server --build-arg mode=development .",
+    "docker-build:prod": "docker build -t optionally-server --build-arg mode=production .",
+    "docker-run:dev": "docker run -dp 3000:3000 optionally-server",
+    "docker-run:prod": "docker run -dp 80:3000 optionally-server"
   },
   "repository": {
     "type": "git",
@@ -29,9 +33,6 @@
     "@types/graphql-depth-limit": "^1.1.2",
     "@types/jest": "^26.0.9",
     "@types/node": "^14.0.26",
-    "graphql-depth-limit": "^1.1.0",
-    "graphql-import": "^1.0.2",
-    "graphql-import-node": "0.0.4",
     "jest": "^26.4.0",
     "nodemon": "^2.0.4",
     "ts-jest": "^26.2.0",
@@ -49,6 +50,9 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql": "^15.3.0",
+    "graphql-depth-limit": "^1.1.0",
+    "graphql-import": "^1.0.2",
+    "graphql-import-node": "0.0.4",
     "http": "0.0.1-security",
     "moment": "^2.27.0",
     "ncp": "^2.0.0"

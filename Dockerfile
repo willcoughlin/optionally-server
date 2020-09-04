@@ -10,12 +10,14 @@ RUN npm ci --quiet && npm run build
 
 # Deploy stage
 FROM node:12
+ARG mode
 
 WORKDIR /app
+ENV NODE_ENV=${mode}
 
 COPY .env ./
 COPY package*.json ./
-RUN npm ci --quiet
+RUN if [ "$mode" = "production" ] ; then npm ci --quiet --only=production ; else npm ci --quiet ; fi
 
 COPY --from=compilation /usr/src/app/dist ./dist
 

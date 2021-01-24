@@ -5,11 +5,11 @@
 export type YahooAutocompleteResponse = {
   ResultSet: {
     Query: string;
-    Result: YahooAutoCompleteResult[];
+    Result: YahooAutocompleteResult[];
   };
 }
 
-export type YahooAutoCompleteResult = {
+export type YahooAutocompleteResult = {
   symbol: string;
   name: string;
   exch: string;

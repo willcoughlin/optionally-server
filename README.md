@@ -18,6 +18,7 @@ After cloning this repo, here's how to get up and running locally.
 #### 1. Configure environment
 You will need to sign up for a free [Quandl dev account and create and API key](https://docs.quandl.com/docs#section-authentication). After you have an API key, create a file in the root of the project called *.env* and add your key as shown below:
 ```
+YAHOO_BASEURL=http://d.yimg.com/autoc.finance.yahoo.com/
 OPC_BASEURL=https://www.optionsprofitcalculator.com/ajax/
 QUANDL_BASEURL=https://www.quandl.com/api/v3/datasets/
 QUANDL_APIKEY=<YOUR API KEY>
@@ -59,12 +60,18 @@ OptionAlly Server is built with:
 - [TypeScript](https://www.typescriptlang.org/)
 - [GraphQL](https://graphql.org/) + [Apollo Server](https://www.apollographql.com/docs/apollo-server/)
 - [Node.js](https://nodejs.org/en/) + [Express](https://expressjs.com/)
+- 
+With special thanks to:
+- [Quandl](https://www.quandl.com/)
+- [Yahoo Finance](https://finance.yahoo.com/)
+- [OptionsProfitCalculator](https://www.optionsprofitcalculator.com/)
   
 ## Schema
 See below for an abridged version of the GraphQL schema. You can view the full version at [/src/graphql/schema.graphql](/src/graphql/schema.graphql).
 ### Queries
 ```graphql
 type Query {
+  lookup(query: String!): [LookupResult]!
   stock(symbol: String!): Stock!
   calculateReturns(input: CalculatorInput!) : CalculatorResult!
 }
@@ -113,10 +120,54 @@ input CalculatorInput {
   shortCall: OptionInput,
   shortPut: OptionInput
 }
+
+type LookupResult {
+  symbol: String!
+  name: String!
+  exchange: String!
+}
 ```
 
 ## Examples
 Now that we've seen the schema, let's see some queries in action.
+
+### Search symbols matching "GM"
+Request:
+```graphql
+{
+  lookup(query: "gm") {
+    symbol
+    name
+    exchange
+  }
+}
+```
+
+Response: 
+```json
+{
+  "data": {
+    "lookup": [
+      {
+        "symbol": "GM",
+        "name": "General Motors Company",
+        "exchange": "NYSE"
+      },
+      {
+        "symbol": "GMVD",
+        "name": "G Medical Innovations Holdings Ltd.",
+        "exchange": "NASDAQ"
+      },
+      {
+        "symbol": "GMIIU",
+        "name": "Gores Metropoulos II, Inc.",
+        "exchange": "NASDAQ"
+      },
+      ...
+    ]
+  }
+}
+```
 
 ### Get price data for $SPY
 Request:
@@ -198,6 +249,17 @@ Response:
 }
 ```
 
+### Calculate max profit or loss from long call:
+Request:
+```graphql
+# TODO: Fill this in
+```
+
+Response:
+```json
+// TODO: Fill this in
+```
+
 ## Source Code
 Let's run through the source code, shall we?
 ### [src/server.ts](src/server.ts)
@@ -205,6 +267,10 @@ Here is the application entry point. It contains configuration for the Apollo an
 
 ### [src/data-source](src/data-source)
 GraphQL resolver data sources. Each subdirectory contains an Interface and current Implementation(s).
+
+#### [src/data-source/autocomplete-api/IAutocompleteApi.ts](src/data-source/autocomplete-api/IAutocompleteApi.ts)
+Declares a method to power the mobile app's symbol autocomplete:
+- `findMatches` for finding stock or ETF symbols that match the user's query.
 
 #### [src/data-source/econ-api/IEconApi.ts](src/data-source/econ-api/IEconApi.ts)
 Declares two macroeconomic data retrieval methods for option pricing:

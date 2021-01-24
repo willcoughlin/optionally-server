@@ -1,3 +1,4 @@
+import IAutocompleteApi from '../data-source/autocomplete-api/IAutocompleteApi';
 import IStocksApi from '../data-source/stocks-api/IStocksApi';
 import { calculateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
 import { Resolvers } from './types';
@@ -5,6 +6,7 @@ import { Resolvers } from './types';
 // Lets resolvers know what's available in the context
 export type ResolverContext = {
   dataSources: {
+    autocompleteApi: IAutocompleteApi,
     stocksApi: IStocksApi
   }
 };
@@ -12,6 +14,7 @@ export type ResolverContext = {
 const resolvers: Resolvers = {
   // Query resolvers
   Query: {
+    lookup: async(_, args, context) => context.dataSources.autocompleteApi.findMatches(args.query),
     stock: async (_, args, context) => context.dataSources.stocksApi.getStock(args.symbol),
     calculateReturns: (_, args) => {
       const maxRiskAndReturn = calculateMaxRiskAndReturn(args.input);

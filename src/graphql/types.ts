@@ -63,6 +63,13 @@ export type ReturnsForDateByStrike = {
   returnInPercent: Scalars['Float'];
 };
 
+export type LookupResult = {
+  __typename?: 'LookupResult';
+  symbol: Scalars['String'];
+  name: Scalars['String'];
+  exchange: Scalars['String'];
+};
+
 export enum OptionType {
   Call = 'CALL',
   Put = 'PUT'
@@ -96,8 +103,14 @@ export type OptionInput = {
 
 export type Query = {
   __typename?: 'Query';
+  lookup: LookupResult;
   stock: Stock;
   calculateReturns: CalculatorResult;
+};
+
+
+export type QueryLookupArgs = {
+  query: Scalars['String'];
 };
 
 
@@ -197,6 +210,7 @@ export type ResolversTypes = ResolversObject<{
   OptionsForExpiry: ResolverTypeWrapper<OptionsForExpiry>;
   CalculatorResult: ResolverTypeWrapper<CalculatorResult>;
   ReturnsForDateByStrike: ResolverTypeWrapper<ReturnsForDateByStrike>;
+  LookupResult: ResolverTypeWrapper<LookupResult>;
   OptionType: OptionType;
   StrategyType: StrategyType;
   CalculatorInput: CalculatorInput;
@@ -216,6 +230,7 @@ export type ResolversParentTypes = ResolversObject<{
   OptionsForExpiry: OptionsForExpiry;
   CalculatorResult: CalculatorResult;
   ReturnsForDateByStrike: ReturnsForDateByStrike;
+  LookupResult: LookupResult;
   CalculatorInput: CalculatorInput;
   OptionInput: OptionInput;
   Int: Scalars['Int'];
@@ -275,7 +290,15 @@ export type ReturnsForDateByStrikeResolvers<ContextType = ResolverContext, Paren
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
+export type LookupResultResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['LookupResult'] = ResolversParentTypes['LookupResult']> = ResolversObject<{
+  symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  exchange?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
 export type QueryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  lookup?: Resolver<ResolversTypes['LookupResult'], ParentType, ContextType, RequireFields<QueryLookupArgs, 'query'>>;
   stock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
   calculateReturns?: Resolver<ResolversTypes['CalculatorResult'], ParentType, ContextType, RequireFields<QueryCalculateReturnsArgs, 'input'>>;
 }>;
@@ -287,6 +310,7 @@ export type Resolvers<ContextType = ResolverContext> = ResolversObject<{
   OptionsForExpiry?: OptionsForExpiryResolvers<ContextType>;
   CalculatorResult?: CalculatorResultResolvers<ContextType>;
   ReturnsForDateByStrike?: ReturnsForDateByStrikeResolvers<ContextType>;
+  LookupResult?: LookupResultResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;
 

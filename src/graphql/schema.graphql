@@ -45,6 +45,12 @@ type ReturnsForDateByStrike {
   returnInPercent: Float!
 }
 
+type LookupResult {
+  symbol: String!
+  name: String!
+  exchange: String!
+}
+
 # Enums
 enum OptionType {
   CALL,
@@ -83,6 +89,7 @@ input OptionInput {
 
 # Queries
 type Query {
+  lookup(query: String!): LookupResult!
   stock(symbol: String!): Stock!
   calculateReturns(input: CalculatorInput!) : CalculatorResult!
 }

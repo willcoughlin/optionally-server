@@ -103,7 +103,7 @@ export type OptionInput = {
 
 export type Query = {
   __typename?: 'Query';
-  lookup: LookupResult;
+  lookup: Array<Maybe<LookupResult>>;
   stock: Stock;
   calculateReturns: CalculatorResult;
 };
@@ -298,7 +298,7 @@ export type LookupResultResolvers<ContextType = ResolverContext, ParentType exte
 }>;
 
 export type QueryResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  lookup?: Resolver<ResolversTypes['LookupResult'], ParentType, ContextType, RequireFields<QueryLookupArgs, 'query'>>;
+  lookup?: Resolver<Array<Maybe<ResolversTypes['LookupResult']>>, ParentType, ContextType, RequireFields<QueryLookupArgs, 'query'>>;
   stock?: Resolver<ResolversTypes['Stock'], ParentType, ContextType, RequireFields<QueryStockArgs, 'symbol'>>;
   calculateReturns?: Resolver<ResolversTypes['CalculatorResult'], ParentType, ContextType, RequireFields<QueryCalculateReturnsArgs, 'input'>>;
 }>;

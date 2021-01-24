@@ -89,7 +89,7 @@ input OptionInput {
 
 # Queries
 type Query {
-  lookup(query: String!): LookupResult!
+  lookup(query: String!): [LookupResult]!
   stock(symbol: String!): Stock!
   calculateReturns(input: CalculatorInput!) : CalculatorResult!
 }

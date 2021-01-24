@@ -1,7 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { LookupResult } from "../../../graphql/types";
 import IAutocompleteApi from "../IAutocompleteApi";
-import { YahooAutocompleteResponse } from "./types";
+import { YahooAutocompleteResponse, YahooAutocompleteResult } from "./types";
 
 /**
  * Yahoo implementation of IAutocompleteApi.
@@ -19,10 +19,43 @@ export default class YahooAutocompleteApi extends RESTDataSource implements IAut
    */
   public async findMatches(query: string) {
     return this.get<YahooAutocompleteResponse>(`autoc?region=1&lang=en&query=${query}`)
-      .then(res => res.ResultSet.Result.map((yahooResultItem): LookupResult => ({
-          symbol: yahooResultItem.symbol,
-          name: yahooResultItem.name,
-          exchange: yahooResultItem.exchDisp
-        })));
+      .then(res => res.ResultSet.Result
+        .filter(this.getMatchesFilterFn)
+        .map(this.getMatchesMapFn));
+  }
+
+  /**
+   * Helper method which returns filter predicate for findMatches API results.
+   * @param yahooResultItem Result item from Yahoo API.
+   * @returns The filter function.
+   */
+  private getMatchesFilterFn(yahooResultItem: YahooAutocompleteResult) {
+    const ALLOWED_TYPES = [
+      'S',  // Stocks
+      'E',  // ETFs
+    ];
+  
+    const ALLOWED_EXCHANGES = [
+      'NYSE',
+      'NASDAQ',
+    ];
+
+    return (
+      ALLOWED_TYPES.includes(yahooResultItem.type)
+      && ALLOWED_EXCHANGES.some(exchange => yahooResultItem.exch.toUpperCase().startsWith(exchange))
+    );
+  }
+
+  /**
+   * Helper method which returns map function for findMatches API results.
+   * @param yahooResultItem Result item from Yahoo API.
+   * @returns The map function.
+   */
+  private getMatchesMapFn(yahooResultItem: YahooAutocompleteResult) {
+    return {
+      symbol: yahooResultItem.symbol,
+      name: yahooResultItem.name,
+      exchange: yahooResultItem.exchDisp
+    };
   }
 }

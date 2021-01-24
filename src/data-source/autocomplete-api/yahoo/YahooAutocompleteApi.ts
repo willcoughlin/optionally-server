@@ -42,7 +42,7 @@ export default class YahooAutocompleteApi extends RESTDataSource implements IAut
 
     return (
       ALLOWED_TYPES.includes(yahooResultItem.type)
-      && ALLOWED_EXCHANGES.some(exchange => yahooResultItem.exch.toUpperCase().startsWith(exchange))
+      && ALLOWED_EXCHANGES.some(exchange => yahooResultItem.exchDisp  .toUpperCase().startsWith(exchange))
     );
   }
 

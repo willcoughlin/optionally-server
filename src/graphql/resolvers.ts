@@ -1,6 +1,6 @@
 import IAutocompleteApi from '../data-source/autocomplete-api/IAutocompleteApi';
 import IStocksApi from '../data-source/stocks-api/IStocksApi';
-import { calculateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
+import { calculateBreakevenAtExpiry, calculateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
 import { Resolvers } from './types';
 
 // Lets resolvers know what's available in the context
@@ -19,7 +19,7 @@ const resolvers: Resolvers = {
     calculateReturns: (_, args) => {
       const maxRiskAndReturn = calculateMaxRiskAndReturn(args.input);
       return {
-        breakEvenAtExpiry: 0,
+        breakEvenAtExpiry: calculateBreakevenAtExpiry(args.input),
         entryCost: calculateEntryCost(args.input),
         maxRisk: maxRiskAndReturn[0],
         maxReturn: maxRiskAndReturn[1],

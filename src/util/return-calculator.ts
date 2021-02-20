@@ -126,19 +126,53 @@ export function calculateMaxRiskAndReturn(input: CalculatorInput): [GQLSafeNumbe
  */
 export function calculateBreakevenAtExpiry(input: CalculatorInput) {
   switch (input.strategy) {
-    case StrategyType.Call:
+    case StrategyType.Call: {
+      const callToUse = input.longCall ?? input.shortCall;
+      if (callToUse)
+        return [callToUse == input.longCall ? callToUse.strike + callToUse.currentPrice : callToUse.strike - callToUse.currentPrice];
+      throw new Error('longCall or shortCall must be defined for StrategyType.Call');
+    }
     case StrategyType.Put: {
+      const putToUse = input.longPut ?? input.shortPut;
+      if (putToUse)
+        return [putToUse == input.longPut ? putToUse.strike - putToUse.currentPrice : putToUse.strike + putToUse.currentPrice];      
+      throw new Error('longPut or shortPut must be defined for StrategyType.Put');
+    }
+    case StrategyType.StraddleStrangle: {
       const callToUse = input.longCall ?? input.shortCall;
       const putToUse = input.longPut ?? input.shortPut;
-      if (callToUse)
-        return [callToUse.strike + callToUse.currentPrice];
-      if (putToUse)
-        return [putToUse.strike - putToUse.currentPrice];
-      const isCall = input.strategy === StrategyType.Call;
-      throw new Error(`${isCall ? 'longCall or shortCall' : 'longPut or shortPut'} must be defined for StrategyType.`
-        + (isCall ? 'Call' : 'Put')); 
+      if (callToUse && putToUse) 
+        return [
+          callToUse == input.longCall ? callToUse.strike + callToUse.currentPrice : callToUse.strike - callToUse.currentPrice, 
+          putToUse == input.longPut ? putToUse.strike - putToUse.currentPrice : putToUse.strike + putToUse.currentPrice
+        ];
+      throw new Error('Both longCall and longPut or both shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
     }
-    
+    case StrategyType.BullCallSpread:
+    case StrategyType.BearCallSpread: {
+      const isBullSpread = input.strategy === StrategyType.BullCallSpread;
+      const callToUse = isBullSpread ? input.longCall : input.shortCall;
+      if (callToUse) 
+        return [callToUse.strike + callToUse.currentPrice];
+      throw new Error(`${isBullSpread ? 'longCall' : 'shortCall'} must be defined for StrategyType.`
+        + (isBullSpread ? 'BullCallSpread' : 'BearCallSpread'));
+    }
+    case StrategyType.BearPutSpread:
+    case StrategyType.BullPutSpread: {
+      const isBullSpread = input.strategy === StrategyType.BullPutSpread;
+      const putToUse = isBullSpread ? input.shortPut : input.longPut;
+      if (putToUse) 
+        return [putToUse.strike - putToUse.currentPrice];
+      throw new Error(`${isBullSpread ? 'shortPut' : 'longPut'} must be defined for StrategyType.`
+        + (isBullSpread ? 'BullPutSpread' : 'BearPutSpread'));
+    }
+    case StrategyType.IronCondor: {
+      const callToUse = input.shortCall;
+      const putToUse = input.shortPut;
+      if (callToUse && putToUse)
+        return [callToUse.strike + callToUse.currentPrice, putToUse.strike - putToUse.currentPrice];
+      throw new Error('shortCall and shortPut must be defiend for StrategyType.IronCondor');
+    }
     default:
       throw new Error('Not implemented');
   }

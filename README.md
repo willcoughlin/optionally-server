@@ -249,15 +249,48 @@ Response:
 }
 ```
 
-### Calculate max profit or loss from long call:
+### Calculate max profit or loss and breakeven points from long strangle:
 Request:
 ```graphql
-# TODO: Fill this in
+{
+  calculateReturns(input: {
+    strategy: STRADDLE_STRANGLE,
+    longCall: {
+      quantity: 1,
+      currentPrice: 1.40,
+      strike: 50,
+      expiry: "2021-03-19"
+    }
+    longPut: {
+      quantity: 1,
+      currentPrice: 1.55,
+      strike: 43.5
+      expiry: "2021-03-19"
+    }
+  }) {
+    entryCost
+    maxRisk
+    maxReturn
+    breakEvenAtExpiry
+  }
+}
 ```
 
 Response:
 ```json
-// TODO: Fill this in
+{
+  "data": {
+    "calculateReturns": {
+      "entryCost": 295,
+      "maxRisk": 295,
+      "maxReturn": null,
+      "breakEvenAtExpiry": [
+        51.4,
+        41.95
+      ]
+    }
+  }
+}
 ```
 
 ## Source Code

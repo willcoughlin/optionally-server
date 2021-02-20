@@ -35,7 +35,7 @@ type CalculatorResult {
   entryCost: Float!,
   maxRisk: Float 
   maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
-  breakEvenAtExpiry: Float!,
+  breakEvenAtExpiry: [Float!]!,  # 1 breakeven for directional plays, 2 breakevens for delta-neutral
   returnsTable: [ReturnsForDateByStrike!]!
 }
 

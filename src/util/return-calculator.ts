@@ -131,9 +131,9 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
       const callToUse = input.longCall ?? input.shortCall;
       const putToUse = input.longPut ?? input.shortPut;
       if (callToUse)
-        return callToUse.strike + callToUse.currentPrice;
+        return [callToUse.strike + callToUse.currentPrice];
       if (putToUse)
-        return putToUse.strike - putToUse.currentPrice;
+        return [putToUse.strike - putToUse.currentPrice];
       const isCall = input.strategy === StrategyType.Call;
       throw new Error(`${isCall ? 'longCall or shortCall' : 'longPut or shortPut'} must be defined for StrategyType.`
         + (isCall ? 'Call' : 'Put')); 

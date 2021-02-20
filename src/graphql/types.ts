@@ -52,7 +52,7 @@ export type CalculatorResult = {
   entryCost: Scalars['Float'];
   maxRisk?: Maybe<Scalars['Float']>;
   maxReturn?: Maybe<Scalars['Float']>;
-  breakEvenAtExpiry: Scalars['Float'];
+  breakEvenAtExpiry: Array<Scalars['Float']>;
   returnsTable: Array<ReturnsForDateByStrike>;
 };
 
@@ -278,7 +278,7 @@ export type CalculatorResultResolvers<ContextType = ResolverContext, ParentType 
   entryCost?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   maxRisk?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   maxReturn?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  breakEvenAtExpiry?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  breakEvenAtExpiry?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
   returnsTable?: Resolver<Array<ResolversTypes['ReturnsForDateByStrike']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;

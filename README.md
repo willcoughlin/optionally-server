@@ -109,7 +109,7 @@ type CalculatorResult {
   entryCost: Float!,
   maxRisk: Float 
   maxReturn: Float
-  breakEvenAtExpiry: Float!,
+  breakEvenAtExpiry: [Float!]!,
   returnsTable: [ReturnsForDateByStrike!]!
 }
 

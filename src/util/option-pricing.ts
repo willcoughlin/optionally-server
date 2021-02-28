@@ -1,4 +1,3 @@
-// import { blackScholes } from 'black-scholes';
 let bs = require('black-scholes');
 import moment, { Moment } from 'moment';
 import { OptionType } from '../graphql/types';
@@ -16,8 +15,8 @@ export function calculateOptionPriceForDates(option: OptionInput, riskFreeIntere
     option.underlyingPrice,
     option.strike,
     expiry.diff(d, 'y', true),
-    option.impliedVolatility,
-    riskFreeInterestRate,
+    option.impliedVolatility / 100,
+    riskFreeInterestRate / 100,
     option.type == OptionType.Call ? 'call' : 'put'
   ));
   return optionsPrices

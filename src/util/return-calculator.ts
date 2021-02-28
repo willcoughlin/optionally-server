@@ -1,4 +1,7 @@
+import moment, { Moment } from 'moment-timezone';
+import IEconApi from '../data-source/econ-api/IEconApi';
 import { CalculatorInput, OptionInput, StrategyType } from "../graphql/types";
+import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates } from './option-pricing';
 import { GQLSafeNumber } from "./types";
 
 /**
@@ -29,10 +32,22 @@ export function calculateEntryCost(input: CalculatorInput) {
     }
     case StrategyType.StraddleStrangle: {
       // Determine whether to use long or short call and put
-      const callInput = input.longCall ?? input.shortCall;
-      const putInput = input.longPut ?? input.shortPut;
-      if (!callInput || !putInput)
+      let callInput: OptionInput;
+      let putInput: OptionInput;
+      if (input.longCall && input.longPut) {
+        callInput = input.longCall;
+        putInput = input.longPut;
+      } else if (input.shortCall && input.shortPut) {
+        callInput = input.shortCall;
+        putInput = input.shortPut;
+      } else {
         throw new Error('Both longCall and longPut or shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
+      }
+
+      // const callInput = input.longCall ?? input.shortCall;
+      // const putInput = input.longPut ?? input.shortPut;
+      // if (!callInput || !putInput)
+      //   throw new Error('Both longCall and longPut or shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
 
       let callContractCost = getContractCost(callInput.currentPrice, callInput.quantity);
       let putContactCost = getContractCost(putInput.currentPrice, putInput.quantity); 
@@ -179,6 +194,41 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
 }
 
 /**
+ * Produces theorerical profit or loss on option strategy given a date and asset price.
+ * @param input Calculator input.
+ * @param econApi IEconApi implementation.
+ * @returns Matrix of profit or loss by underlying price and date.
+ */
+export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi) {
+  const matrix = Array<Array<number>>();
+  const optionLegs = selectLegsBasedOnStrategy(input);  
+  if (optionLegs.length === 0) return matrix;
+  
+  const expiry = optionLegs[0].expiry;
+  // Calendar spread and other strategies with differing expiries not supported
+  if (!optionLegs.every(leg => leg.expiry === expiry)) return matrix; 
+
+  const datesToReturn = getDatesForReturnMatrix(expiry);
+  const pricesToReturn = getPricesForReturnMatrix(0, optionLegs);
+  
+  const inflationRate = await econApi.getInflationRate();
+  const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
+  const riskFreeInterestRate = calculateApproximateRiskFreeInterestRate(tBillRate, inflationRate);
+
+  for (let price of pricesToReturn) {
+    const optionPricesToAdd = new Array<Array<number>>();
+    for (let optionLeg of optionLegs) {
+      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLeg, underlyingPrice: price }, riskFreeInterestRate, datesToReturn));
+    }
+    
+    const matrixRowForPrice = optionPricesToAdd[0].map((_, i) => optionPricesToAdd.map(row => row[i]).reduce((sum, num) => sum + num));
+    matrix.push(matrixRowForPrice);
+  }
+
+  return matrix;
+}
+
+/**
  * Validates option leg for Call or Put strategy type.
  * @param input Calculator input with StrategyType Call or Put.
  * @returns Call or Put option to use in calculation.
@@ -226,4 +276,74 @@ function validateVerticalSpreadOptionLegs(input: CalculatorInput): [OptionInput,
     return [longPut, shortPut];
   }
   throw new Error('StrategyType must be a vertical spread type (BullCallSpread, BearCallSpread, BearPutSpread, BullPutSpread)');
+}
+
+/**
+ * Gets legs to use from inpuy based on option strategy.
+ * @param input Calculator input.
+ * @returns Array of OptionInputs to use.
+ */
+function selectLegsBasedOnStrategy(input: CalculatorInput) {
+  const optionLegs: OptionInput[] = [];
+  switch (input.strategy) {
+    case StrategyType.Call:
+    case StrategyType.Put:
+    case StrategyType.StraddleStrangle: {
+      if (StrategyType.StraddleStrangle || StrategyType.Call) {
+        const callToUse = input.longCall || input.shortCall;
+        if (callToUse) optionLegs.push(callToUse);
+      }
+      if (StrategyType.StraddleStrangle || StrategyType.Put) {
+        const putToUse = input.longPut || input.shortPut;
+        if (putToUse) optionLegs.push(putToUse);
+      }
+    }
+    case StrategyType.BullCallSpread:
+    case StrategyType.BearCallSpread:
+    case StrategyType.BearPutSpread:
+    case StrategyType.BullPutSpread: {
+      if ((StrategyType.IronCondor || StrategyType.BullCallSpread || StrategyType.BearCallSpread)
+        && input.longCall && input.shortCall) {
+          optionLegs.push(input.longCall, input.shortCall);
+      }
+      if ((StrategyType.IronCondor || StrategyType.BearPutSpread || StrategyType.BullPutSpread)
+        && input.longPut && input.shortPut) {
+          optionLegs.push(input.longPut, input.shortPut);
+      }
+    }
+  }
+  return optionLegs;
+}
+
+/**
+ * Creates an array of dates to use in the Return Matrix, up to 90 dates long.
+ * @param expiry Expiration date as a string.
+ * @returns Array of dates (as Moments, ascending) to use in matrix.
+ */
+function getDatesForReturnMatrix(expiry: string) {
+  const tz = 'America/New_York';
+  const expiryMoment = moment.tz(expiry, tz);
+  const daysToExpiry = Math.ceil(expiryMoment.diff(moment.tz(tz), 'd', true));
+  // Determine step count
+  let interval = 1;
+  while (daysToExpiry / interval >= 90) {
+    interval++;
+  }
+  // Fill array
+  const datesToReturn = new Array<Moment>();
+  for (let i = 0; i < daysToExpiry; i += interval) {
+    datesToReturn.push(moment.tz(tz).add(i, 'd'));
+  }
+
+  return datesToReturn;
+}
+
+/**
+ * Creates an array of underlying asset prices to use in Return Matrix
+ * @param underlyingPrice Underlying asset price.
+ * @param optionLegs Legs of option strategy.
+ * @returns Array of possible asset prices (descending).
+ */
+function getPricesForReturnMatrix(underlyingPrice: number, optionLegs: OptionInput[]) {
+  return [5, 4.75, 4.5, 4.25, 4, 3.75, 3.5, 3.25, 3];
 }

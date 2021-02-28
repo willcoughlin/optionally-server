@@ -1,13 +1,16 @@
 import IAutocompleteApi from '../data-source/autocomplete-api/IAutocompleteApi';
+import IEconApi from '../data-source/econ-api/IEconApi';
 import IStocksApi from '../data-source/stocks-api/IStocksApi';
-import { calculateBreakevenAtExpiry, calculateEntryCost, calculateMaxRiskAndReturn } from '../util/return-calculator';
+import * as returnCalculator from '../util/return-calculator';
+
 import { Resolvers } from './types';
 
 // Lets resolvers know what's available in the context
 export type ResolverContext = {
   dataSources: {
     autocompleteApi: IAutocompleteApi,
-    stocksApi: IStocksApi
+    stocksApi: IStocksApi,
+    econApi: IEconApi,
   }
 };
 
@@ -16,15 +19,15 @@ const resolvers: Resolvers = {
   Query: {
     lookup: async(_, args, context) => context.dataSources.autocompleteApi.findMatches(args.query),
     stock: async (_, args, context) => context.dataSources.stocksApi.getStock(args.symbol),
-    calculateReturns: (_, args) => {
-      const maxRiskAndReturn = calculateMaxRiskAndReturn(args.input);
+    calculateReturns: async (_, args, context) => {
+      const maxRiskAndReturn = returnCalculator.calculateMaxRiskAndReturn(args.input);
       return {
-        breakEvenAtExpiry: calculateBreakevenAtExpiry(args.input),
-        entryCost: calculateEntryCost(args.input),
+        breakEvenAtExpiry: returnCalculator.calculateBreakevenAtExpiry(args.input),
+        entryCost: returnCalculator.calculateEntryCost(args.input),
         maxRisk: maxRiskAndReturn[0],
         maxReturn: maxRiskAndReturn[1],
-        returnsTable: []
-      };  
+        returnsTable: await returnCalculator.calculateReturnMatrix(args.input, context.dataSources.econApi)
+      };
     }
   },
   // @ts-ignore

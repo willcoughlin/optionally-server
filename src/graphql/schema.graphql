@@ -36,13 +36,7 @@ type CalculatorResult {
   maxRisk: Float 
   maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
   breakEvenAtExpiry: [Float!]!,  # 1 breakeven for directional plays, 2 breakevens for delta-neutral
-  returnsTable: [ReturnsForDateByStrike!]!
-}
-
-type ReturnsForDateByStrike {
-  date: String!,
-  returnInDollars: Float!,
-  returnInPercent: Float!
+  returnsTable: [[Float!]!]!
 }
 
 type LookupResult {
@@ -85,6 +79,9 @@ input OptionInput {
   currentPrice: Float!,
   strike: Float!,
   expiry: String!
+  underlyingPrice: Float!,
+  impliedVolatility: Float!
+  type: OptionType!
 }
 
 # Queries

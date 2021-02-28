@@ -1,3 +1,4 @@
+import { ReturnsTable } from './../graphql/types';
 import moment, { Moment } from 'moment-timezone';
 import IEconApi from '../data-source/econ-api/IEconApi';
 import { CalculatorInput, OptionInput, StrategyType } from "../graphql/types";
@@ -199,22 +200,23 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
  * @param econApi IEconApi implementation.
  * @returns Matrix of profit or loss by underlying price and date.
  */
-export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi) {
-  const matrix = Array<Array<number>>();
+export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi): Promise<ReturnsTable> {
+
   const optionLegs = selectLegsBasedOnStrategy(input);  
-  if (optionLegs.length === 0) return matrix;
+  if (optionLegs.length === 0) throw new Error('Cannot calculate returns for zero-leg strategy');
   
   const expiry = optionLegs[0].expiry;
   // Calendar spread and other strategies with differing expiries not supported
-  if (!optionLegs.every(leg => leg.expiry === expiry)) return matrix; 
-
+  if (!optionLegs.every(leg => leg.expiry === expiry)) throw new Error('Strategies with varying expiries not supported');
+  
   const datesToReturn = getDatesForReturnMatrix(expiry);
   const pricesToReturn = getPricesForReturnMatrix(0, optionLegs);
   
   const inflationRate = await econApi.getInflationRate();
   const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
   const riskFreeInterestRate = calculateApproximateRiskFreeInterestRate(tBillRate, inflationRate);
-
+  
+  const matrix = Array<Array<number>>();
   for (let price of pricesToReturn) {
     const optionPricesToAdd = new Array<Array<number>>();
     for (let optionLeg of optionLegs) {
@@ -225,7 +227,11 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
     matrix.push(matrixRowForPrice);
   }
 
-  return matrix;
+  return {
+    dates: datesToReturn.map(d => d.format('YYYY-MM-DD')),
+    underlyingPrices: pricesToReturn,
+    dataMatrix: matrix
+  };
 }
 
 /**

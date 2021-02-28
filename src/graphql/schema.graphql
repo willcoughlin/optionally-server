@@ -32,11 +32,17 @@ type OptionsForExpiry {
 }
 
 type CalculatorResult {
-  entryCost: Float!,
+  entryCost: Float!
   maxRisk: Float 
   maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
-  breakEvenAtExpiry: [Float!]!,  # 1 breakeven for directional plays, 2 breakevens for delta-neutral
-  returnsTable: [[Float!]!]!
+  breakEvenAtExpiry: [Float!]!  # 1 breakeven for directional plays, 2 breakevens for delta-neutral
+  returnsTable: ReturnsTable!
+}
+
+type ReturnsTable {
+  dates: [String!]!
+  underlyingPrices: [Float!]!
+  dataMatrix: [[Float!]!]!
 }
 
 type LookupResult {

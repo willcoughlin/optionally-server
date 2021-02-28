@@ -53,7 +53,14 @@ export type CalculatorResult = {
   maxRisk?: Maybe<Scalars['Float']>;
   maxReturn?: Maybe<Scalars['Float']>;
   breakEvenAtExpiry: Array<Scalars['Float']>;
-  returnsTable: Array<Array<Scalars['Float']>>;
+  returnsTable: ReturnsTable;
+};
+
+export type ReturnsTable = {
+  __typename?: 'ReturnsTable';
+  dates: Array<Scalars['String']>;
+  underlyingPrices: Array<Scalars['Float']>;
+  dataMatrix: Array<Array<Scalars['Float']>>;
 };
 
 export type LookupResult = {
@@ -205,6 +212,7 @@ export type ResolversTypes = ResolversObject<{
   Option: ResolverTypeWrapper<Option>;
   OptionsForExpiry: ResolverTypeWrapper<OptionsForExpiry>;
   CalculatorResult: ResolverTypeWrapper<CalculatorResult>;
+  ReturnsTable: ResolverTypeWrapper<ReturnsTable>;
   LookupResult: ResolverTypeWrapper<LookupResult>;
   OptionType: OptionType;
   StrategyType: StrategyType;
@@ -224,6 +232,7 @@ export type ResolversParentTypes = ResolversObject<{
   Option: Option;
   OptionsForExpiry: OptionsForExpiry;
   CalculatorResult: CalculatorResult;
+  ReturnsTable: ReturnsTable;
   LookupResult: LookupResult;
   CalculatorInput: CalculatorInput;
   OptionInput: OptionInput;
@@ -273,7 +282,14 @@ export type CalculatorResultResolvers<ContextType = ResolverContext, ParentType 
   maxRisk?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   maxReturn?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   breakEvenAtExpiry?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
-  returnsTable?: Resolver<Array<Array<ResolversTypes['Float']>>, ParentType, ContextType>;
+  returnsTable?: Resolver<ResolversTypes['ReturnsTable'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type ReturnsTableResolvers<ContextType = ResolverContext, ParentType extends ResolversParentTypes['ReturnsTable'] = ResolversParentTypes['ReturnsTable']> = ResolversObject<{
+  dates?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  underlyingPrices?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
+  dataMatrix?: Resolver<Array<Array<ResolversTypes['Float']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -296,6 +312,7 @@ export type Resolvers<ContextType = ResolverContext> = ResolversObject<{
   Option?: OptionResolvers<ContextType>;
   OptionsForExpiry?: OptionsForExpiryResolvers<ContextType>;
   CalculatorResult?: CalculatorResultResolvers<ContextType>;
+  ReturnsTable?: ReturnsTableResolvers<ContextType>;
   LookupResult?: LookupResultResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;

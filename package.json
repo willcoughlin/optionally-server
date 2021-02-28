@@ -55,6 +55,7 @@
     "graphql-import-node": "0.0.4",
     "http": "0.0.1-security",
     "moment": "^2.27.0",
+    "moment-timezone": "^0.5.33",
     "ncp": "^2.0.0"
   }
 }

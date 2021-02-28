@@ -2,6 +2,7 @@ import { RESTDataSource } from 'apollo-datasource-rest';
 import { Option, OptionsForExpiry, OptionType, Stock } from '../../../graphql/types';
 import IStocksApi from '../IStocksApi';
 import { OPCErrorResponse, OPCOptionsResponse, OPCStockResponse } from './types';
+import moment from 'moment';
 
 /**
  * OptionsProfitCalculator implementation of IStocksApi.
@@ -65,7 +66,7 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
 
         // Map options chain in OptionsProfitCalculator response format to our OptionsForExpiry type.
         return Object.keys(options)
-          .filter(key => key != '_data_source' && options[key])
+          .filter(key => key != '_data_source' && options[key] && moment(key).isSameOrAfter(moment.tz('America/New_York'), 'd'))
           .map((expiry): OptionsForExpiry => ({
             expiry: expiry,
             calls: Object.keys(options[expiry].c).map(this.getContractMapFn(expiry, underlyingSymbol, underlyingPrice, options, OptionType.Call)),

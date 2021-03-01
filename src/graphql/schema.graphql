@@ -86,7 +86,6 @@ input OptionInput {
   expiry: String!
   underlyingPrice: Float!,
   underlyingSymbol: String!,
-  impliedVolatility: Float!
   type: OptionType!
 }
 

@@ -9,7 +9,6 @@ beforeEach(function() {
     expiry: '2020-01-15',
     quantity: 1,
     strike: 50,
-    impliedVolatility: 20,
     type: OptionType.Call,
     underlyingPrice: 45,
     underlyingSymbol: ''

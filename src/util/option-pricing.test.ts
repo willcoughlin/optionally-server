@@ -19,7 +19,6 @@ describe('calculateOptionPriceForDates', function() {
         expiry: '2025-01-01',
         strike: 34,
         type: OptionType.Call,
-        impliedVolatility: 20,
         quantity: 1,
         underlyingSymbol: ''
       };
@@ -37,7 +36,6 @@ describe('calculateOptionPriceForDates', function() {
         expiry: '2025-01-01',
         strike: 34,
         type: OptionType.Call,
-        impliedVolatility: 20,
         quantity: 1,
         underlyingSymbol: ''
       };

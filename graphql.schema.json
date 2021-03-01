@@ -901,20 +901,6 @@
             "defaultValue": null
           },
           {
-            "name": "impliedVolatility",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "type",
             "description": null,
             "type": {

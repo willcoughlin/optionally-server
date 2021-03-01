@@ -1,8 +1,8 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
-import { Option, OptionInput, OptionsForExpiry, OptionType, Stock } from '../../../graphql/types';
+import moment from 'moment';
+import { Option, OptionsForExpiry, OptionType, Stock } from '../../../graphql/types';
 import IStocksApi from '../IStocksApi';
 import { OPCErrorResponse, OPCOptionsResponse, OPCStockResponse } from './types';
-import moment from 'moment';
 
 /**
  * OptionsProfitCalculator implementation of IStocksApi.
@@ -96,14 +96,8 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
         ask: parseFloat(contract.a),
         last: parseFloat(contract.l),
         strike: parseFloat(strike),
-        type: type,
-        impliedVolatility: 0 // parseFloat(contract.v) TODO: this was actually volume. need to get real IV
+        type: type
       };
     }
-  }
-
-  // OptionsProfitCalculator does not implement
-  public getImpliedVolatility(option: OptionInput): Promise<number> {
-    throw new Error('Method not implemented.');
   }
 }

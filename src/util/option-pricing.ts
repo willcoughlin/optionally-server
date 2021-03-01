@@ -1,13 +1,14 @@
 let bs = require('black-scholes');
 import moment, { Moment } from 'moment-timezone';
-import { OptionType } from '../graphql/types';
-import { OptionInput } from './../graphql/types';
+import { OptionInput, OptionType } from '../graphql/types';
+
+export type OptionInputWithIV = OptionInput & { impliedVolatility: number };
 
 export function calculateApproximateRiskFreeInterestRate(tBillRate: number, inflationRate: number) {
   return tBillRate + inflationRate;
 }
 
-export function calculateOptionPriceForDates(option: OptionInput, riskFreeInterestRate: number, dates: Moment[]) {
+export function calculateOptionPriceForDates(option: OptionInputWithIV, riskFreeInterestRate: number, dates: Moment[]) {
   if (dates.length == 0) return [];
 
   const expiry = moment.tz(option.expiry, 'America/New_York');
@@ -22,7 +23,7 @@ export function calculateOptionPriceForDates(option: OptionInput, riskFreeIntere
   return optionsPrices
 }
 
-export function getApproximateImpliedVolatility(option: OptionInput, riskFreeInterestRate: number) {
+export function calculateApproximateImpliedVolatility(option: OptionInput, riskFreeInterestRate: number) {
   const t = moment(option.expiry).diff(moment(), 'y', true);
   const calcPrice = (iv: number) => bs.blackScholes(option.underlyingPrice, option.strike, t, iv, riskFreeInterestRate / 100, 
     OptionType.Call ? 'call' : 'put');
@@ -38,5 +39,5 @@ export function getApproximateImpliedVolatility(option: OptionInput, riskFreeInt
       else if (bsPrice < actualPrice) iv += increment;
     }
 
-    return iv;
+    return iv * 100;
 }

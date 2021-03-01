@@ -1,8 +1,7 @@
 import moment, { Moment } from 'moment-timezone';
 import IEconApi from '../data-source/econ-api/IEconApi';
-import { CalculatorInput, OptionInput, StrategyType } from "../graphql/types";
-import { ReturnsTable } from './../graphql/types';
-import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates, getApproximateImpliedVolatility } from './option-pricing';
+import { CalculatorInput, OptionInput, ReturnsTable, StrategyType } from "../graphql/types";
+import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates, calculateApproximateImpliedVolatility, OptionInputWithIV } from './option-pricing';
 import { GQLSafeNumber } from "./types";
 
 /**
@@ -212,15 +211,16 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
   const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
   const riskFreeInterestRate = calculateApproximateRiskFreeInterestRate(tBillRate, inflationRate);
 
-  for (let leg of optionLegs) {
-    leg.impliedVolatility = getApproximateImpliedVolatility(leg, riskFreeInterestRate);
-  }
+  const optionLegsWithIV: OptionInputWithIV[] = optionLegs.map(leg => ({
+    ...leg,
+    impliedVolatility: calculateApproximateImpliedVolatility(leg, riskFreeInterestRate)
+  }));
 
   const matrix = Array<Array<number>>();
   for (let price of pricesToReturn) {
     const optionPricesToAdd = new Array<Array<number>>();
-    for (let optionLeg of optionLegs) {
-      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLeg, underlyingPrice: price }, 
+    for (let optionLegWithIv of optionLegsWithIV) {
+      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLegWithIv, underlyingPrice: price }, 
         riskFreeInterestRate, datesToReturn));
     }
     

@@ -11,7 +11,8 @@ beforeEach(function() {
     strike: 50,
     impliedVolatility: 20,
     type: OptionType.Call,
-    underlyingPrice: 45
+    underlyingPrice: 45,
+    underlyingSymbol: ''
   };
 });
 

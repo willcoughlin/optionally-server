@@ -20,7 +20,8 @@ describe('calculateOptionPriceForDates', function() {
         strike: 34,
         type: OptionType.Call,
         impliedVolatility: 20,
-        quantity: 1
+        quantity: 1,
+        underlyingSymbol: ''
       };
       const riskFreeRate = 0.1;
 
@@ -37,7 +38,8 @@ describe('calculateOptionPriceForDates', function() {
         strike: 34,
         type: OptionType.Call,
         impliedVolatility: 20,
-        quantity: 1
+        quantity: 1,
+        underlyingSymbol: ''
       };
       const riskFreeRate = 0.1;
       const nowMoment = moment();

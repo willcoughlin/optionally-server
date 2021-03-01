@@ -1,5 +1,5 @@
 let bs = require('black-scholes');
-import moment, { Moment } from 'moment';
+import moment, { Moment } from 'moment-timezone';
 import { OptionType } from '../graphql/types';
 import { OptionInput } from './../graphql/types';
 
@@ -10,11 +10,11 @@ export function calculateApproximateRiskFreeInterestRate(tBillRate: number, infl
 export function calculateOptionPriceForDates(option: OptionInput, riskFreeInterestRate: number, dates: Moment[]) {
   if (dates.length == 0) return [];
 
-  const expiry = moment(option.expiry);
+  const expiry = moment.tz(option.expiry, 'America/New_York');
   const optionsPrices = dates.map(d => bs.blackScholes(
     option.underlyingPrice,
     option.strike,
-    expiry.diff(d, 'y', true),
+    Math.max(expiry.diff(d, 'y', true), 0),  // safe-guard against negative, which will return NaN
     option.impliedVolatility / 100,
     riskFreeInterestRate / 100,
     option.type == OptionType.Call ? 'call' : 'put'

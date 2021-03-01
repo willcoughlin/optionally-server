@@ -19,28 +19,27 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
    * @returns Stock data object.
    */
   public async getStock(symbol: string) {
-    return this.get<OPCStockResponse | OPCErrorResponse>(`getStockPrice?stock=${symbol}&reqId=0`)
-      .then(res => {
-        // If 'desc' prop in response, we got an error
-        if ('desc' in res) {
-          throw new Error('Could not fetch data for underlying: ' + symbol);  
-        }
-        // If we can't cast to OPCStockResponse for some other reason, return.
-        const stockResponse = res as OPCStockResponse;
-        if (stockResponse == null) {
-          throw new Error('Could not fetch data for underlying: ' + symbol);  
-        }
-        // Map to our Stock type
-        const stock: Stock = {
-          symbol: symbol.toUpperCase(),
-          ask: stockResponse.price.ask,
-          bid: stockResponse.price.bid,
-          last: stockResponse.price.last,
-          optionsChain: []
-        };
+    const res = await this.get<OPCStockResponse | OPCErrorResponse>(`getStockPrice?stock=${symbol}&reqId=0`);
 
-        return stock;
-    });
+    // If 'desc' prop in response, we got an error
+    if ('desc' in res) {
+      throw new Error('Could not fetch data for underlying: ' + symbol);  
+    }
+    // If we can't cast to OPCStockResponse for some other reason, return.
+    const stockResponse = res as OPCStockResponse;
+    if (stockResponse == null) {
+      throw new Error('Could not fetch data for underlying: ' + symbol);  
+    }
+    // Map to our Stock type
+    const stock: Stock = {
+      symbol: symbol.toUpperCase(),
+      ask: stockResponse.price.ask,
+      bid: stockResponse.price.bid,
+      last: stockResponse.price.last,
+      optionsChain: []
+    };
+
+    return stock;
   }
 
   /**
@@ -50,29 +49,27 @@ export default class OPCStocksApi extends RESTDataSource implements IStocksApi {
    */
   public async getOptions(underlying: Stock) {
     const { symbol: underlyingSymbol, last: underlyingPrice } = underlying;
-    return this.get<OPCOptionsResponse | OPCErrorResponse>(`getOptions?stock=${underlyingSymbol}&reqId=1`)
-      .then(res => {
-        // If 'desc' prop in response, we got an error
-        if ('desc' in res) {
-          throw new Error('Could not fetch options chain for underlying: ' + underlyingSymbol);
-        }
-        // If we can't cast to OPCOptionsResponse for some other reason, return.
-        const optionsResponse = res as OPCOptionsResponse;
-        if (optionsResponse == null) {
-          throw new Error('Could not fetch options chain for underlying: ' + underlyingSymbol);
-        }
+    const res = await this.get<OPCOptionsResponse | OPCErrorResponse>(`getOptions?stock=${underlyingSymbol}&reqId=1`);
+    // If 'desc' prop in response, we got an error
+    if ('desc' in res) {
+      throw new Error('Could not fetch options chain for underlying: ' + underlyingSymbol);
+    }
+    // If we can't cast to OPCOptionsResponse for some other reason, return.
+    const optionsResponse = res as OPCOptionsResponse;
+    if (optionsResponse == null) {
+      throw new Error('Could not fetch options chain for underlying: ' + underlyingSymbol);
+    }
 
-        const options = optionsResponse.options;
+    const options = optionsResponse.options;
 
-        // Map options chain in OptionsProfitCalculator response format to our OptionsForExpiry type.
-        return Object.keys(options)
-          .filter(key => key != '_data_source' && options[key] && moment(key).isSameOrAfter(moment.tz('America/New_York'), 'd'))
-          .map((expiry): OptionsForExpiry => ({
-            expiry: expiry,
-            calls: Object.keys(options[expiry].c).map(this.getContractMapFn(expiry, underlyingSymbol, underlyingPrice, options, OptionType.Call)),
-            puts: Object.keys(options[expiry].p).map(this.getContractMapFn(expiry, underlyingSymbol, underlyingPrice, options, OptionType.Put))
-          }));
-      });
+    // Map options chain in OptionsProfitCalculator response format to our OptionsForExpiry type.
+    return Object.keys(options)
+      .filter(key => key != '_data_source' && options[key] && moment(key).isSameOrAfter(moment.tz('America/New_York'), 'd'))
+      .map((expiry): OptionsForExpiry => ({
+        expiry: expiry,
+        calls: Object.keys(options[expiry].c).map(this.getContractMapFn(expiry, underlyingSymbol, underlyingPrice, options, OptionType.Call)),
+        puts: Object.keys(options[expiry].p).map(this.getContractMapFn(expiry, underlyingSymbol, underlyingPrice, options, OptionType.Put))
+      }));
   }
 
   /**

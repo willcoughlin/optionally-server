@@ -18,10 +18,10 @@ export default class YahooAutocompleteApi extends RESTDataSource implements IAut
    * @returns List of matches.
    */
   public async findMatches(query: string) {
-    return this.get<YahooAutocompleteResponse>(`autoc?region=1&lang=en&query=${query}`)
-      .then(res => res.ResultSet.Result
+    const res = await this.get<YahooAutocompleteResponse>(`autoc?region=1&lang=en&query=${query}`);
+    return res.ResultSet.Result
         .filter(this.getMatchesFilterFn)
-        .map(this.getMatchesMapFn));
+        .map(this.getMatchesMapFn);
   }
 
   /**

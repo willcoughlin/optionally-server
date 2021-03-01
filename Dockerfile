@@ -4,7 +4,7 @@ FROM node:12 AS compilation
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-COPY tsconfig*.json ./
+COPY tsconfig.json ./
 COPY ./src ./src/
 RUN npm ci --quiet && npm run build
 

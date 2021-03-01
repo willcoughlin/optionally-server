@@ -1,7 +1,8 @@
-import { ReturnsTable } from './../graphql/types';
 import moment, { Moment } from 'moment-timezone';
 import IEconApi from '../data-source/econ-api/IEconApi';
+import IStocksApi from '../data-source/stocks-api/IStocksApi';
 import { CalculatorInput, OptionInput, StrategyType } from "../graphql/types";
+import { ReturnsTable } from './../graphql/types';
 import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates } from './option-pricing';
 import { GQLSafeNumber } from "./types";
 
@@ -44,11 +45,6 @@ export function calculateEntryCost(input: CalculatorInput) {
       } else {
         throw new Error('Both longCall and longPut or shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
       }
-
-      // const callInput = input.longCall ?? input.shortCall;
-      // const putInput = input.longPut ?? input.shortPut;
-      // if (!callInput || !putInput)
-      //   throw new Error('Both longCall and longPut or shortCall and shortPut must be defined for StrategyType.StraddleStrangle');
 
       let callContractCost = getContractCost(callInput.currentPrice, callInput.quantity);
       let putContactCost = getContractCost(putInput.currentPrice, putInput.quantity); 
@@ -198,9 +194,10 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
  * Produces theorerical profit or loss on option strategy given a date and asset price.
  * @param input Calculator input.
  * @param econApi IEconApi implementation.
+ * @param ivApi TODO: remove
  * @returns Matrix of profit or loss by underlying price and date.
  */
-export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi): Promise<ReturnsTable> {
+export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi, ivApi: IStocksApi): Promise<ReturnsTable> {
 
   const optionLegs = selectLegsBasedOnStrategy(input);  
   if (optionLegs.length === 0) throw new Error('Cannot calculate returns for zero-leg strategy');
@@ -215,12 +212,19 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
   const inflationRate = await econApi.getInflationRate();
   const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
   const riskFreeInterestRate = calculateApproximateRiskFreeInterestRate(tBillRate, inflationRate);
-  
+
+  // TODO: since we don't have IV at this point, we need teo query it separately
+  for (let leg of optionLegs) {
+    leg.impliedVolatility = await ivApi.getImpliedVolatility(leg);
+  }
+
   const matrix = Array<Array<number>>();
   for (let price of pricesToReturn) {
     const optionPricesToAdd = new Array<Array<number>>();
     for (let optionLeg of optionLegs) {
-      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLeg, underlyingPrice: price }, riskFreeInterestRate, datesToReturn));
+      const iv = await ivApi.getImpliedVolatility(optionLeg);
+      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLeg, impliedVolatility: iv, underlyingPrice: price }, 
+        riskFreeInterestRate, datesToReturn));
     }
     
     const matrixRowForPrice = optionPricesToAdd[0].map((_, i) => optionPricesToAdd.map(row => row[i]).reduce((sum, num) => sum + num));

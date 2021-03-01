@@ -11,6 +11,7 @@ export type ResolverContext = {
     autocompleteApi: IAutocompleteApi,
     stocksApi: IStocksApi,
     econApi: IEconApi,
+    ivApi: IStocksApi
   }
 };
 
@@ -26,7 +27,7 @@ const resolvers: Resolvers = {
         entryCost: returnCalculator.calculateEntryCost(args.input),
         maxRisk: maxRiskAndReturn[0],
         maxReturn: maxRiskAndReturn[1],
-        returnsTable: await returnCalculator.calculateReturnMatrix(args.input, context.dataSources.econApi)
+        returnsTable: await returnCalculator.calculateReturnMatrix(args.input, context.dataSources.econApi, context.dataSources.ivApi)
       };
     }
   },

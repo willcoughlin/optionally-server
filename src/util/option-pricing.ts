@@ -21,3 +21,22 @@ export function calculateOptionPriceForDates(option: OptionInput, riskFreeIntere
   ));
   return optionsPrices
 }
+
+export function getApproximateImpliedVolatility(option: OptionInput, riskFreeInterestRate: number) {
+  const t = moment(option.expiry).diff(moment(), 'y', true);
+  const calcPrice = (iv: number) => bs.blackScholes(option.underlyingPrice, option.strike, t, iv, riskFreeInterestRate / 100, 
+    OptionType.Call ? 'call' : 'put');
+  
+    const precision = 0.01;
+    const increment = 0.001;
+    const actualPrice = option.currentPrice;
+    let bsPrice = 0;
+    let iv = 1;
+    while (Math.abs(actualPrice - bsPrice) > precision) {
+      bsPrice = calcPrice(iv);
+      if (bsPrice > actualPrice) iv -= increment;
+      else if (bsPrice < actualPrice) iv += increment;
+    }
+
+    return iv;
+}

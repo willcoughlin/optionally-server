@@ -1,9 +1,8 @@
 import moment, { Moment } from 'moment-timezone';
 import IEconApi from '../data-source/econ-api/IEconApi';
-import IStocksApi from '../data-source/stocks-api/IStocksApi';
 import { CalculatorInput, OptionInput, StrategyType } from "../graphql/types";
 import { ReturnsTable } from './../graphql/types';
-import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates } from './option-pricing';
+import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates, getApproximateImpliedVolatility } from './option-pricing';
 import { GQLSafeNumber } from "./types";
 
 /**
@@ -197,7 +196,7 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
  * @param ivApi TODO: remove
  * @returns Matrix of profit or loss by underlying price and date.
  */
-export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi, ivApi: IStocksApi): Promise<ReturnsTable> {
+export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi): Promise<ReturnsTable> {
 
   const optionLegs = selectLegsBasedOnStrategy(input);  
   if (optionLegs.length === 0) throw new Error('Cannot calculate returns for zero-leg strategy');
@@ -213,17 +212,15 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
   const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
   const riskFreeInterestRate = calculateApproximateRiskFreeInterestRate(tBillRate, inflationRate);
 
-  // TODO: since we don't have IV at this point, we need teo query it separately
   for (let leg of optionLegs) {
-    leg.impliedVolatility = await ivApi.getImpliedVolatility(leg);
+    leg.impliedVolatility = getApproximateImpliedVolatility(leg, riskFreeInterestRate);
   }
 
   const matrix = Array<Array<number>>();
   for (let price of pricesToReturn) {
     const optionPricesToAdd = new Array<Array<number>>();
     for (let optionLeg of optionLegs) {
-      const iv = await ivApi.getImpliedVolatility(optionLeg);
-      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLeg, impliedVolatility: iv, underlyingPrice: price }, 
+      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLeg, underlyingPrice: price }, 
         riskFreeInterestRate, datesToReturn));
     }
     

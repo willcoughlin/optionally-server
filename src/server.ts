@@ -9,7 +9,6 @@ import { createServer } from 'http';
 import YahooAutocompleteApi from './data-source/autocomplete-api/yahoo/YahooAutocompleteApi';
 import QuandlEconApi from './data-source/econ-api/quandl/QuandlEconApi';
 import OPCStocksApi from './data-source/stocks-api/opc/OPCStocksApi';
-import TDAStocksApi from './data-source/stocks-api/tda/TDAStocksApi';
 import schema from './graphql/schema';
 
 // Create express app
@@ -25,7 +24,6 @@ const server = new ApolloServer({
     autocompleteApi: new YahooAutocompleteApi(),
     stocksApi: new OPCStocksApi(),
     econApi: new QuandlEconApi(),
-    ivApi: new TDAStocksApi()  // TODO: replace OPC stocks api with TDA, eliminate need for ivApi prop.
   })
 }); 
 

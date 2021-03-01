@@ -100,6 +100,7 @@ export type OptionInput = {
   strike: Scalars['Float'];
   expiry: Scalars['String'];
   underlyingPrice: Scalars['Float'];
+  underlyingSymbol: Scalars['String'];
   impliedVolatility: Scalars['Float'];
   type: OptionType;
 };

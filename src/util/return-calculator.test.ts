@@ -1,4 +1,4 @@
-import { CalculatorInput, OptionInput, StrategyType } from '../graphql/types';
+import { CalculatorInput, OptionInput, OptionType, StrategyType } from '../graphql/types';
 import * as returnCalculator from './return-calculator';
 
 let testOption: OptionInput;
@@ -8,7 +8,10 @@ beforeEach(function() {
     currentPrice: 0.1,
     expiry: '2020-01-15',
     quantity: 1,
-    strike: 50
+    strike: 50,
+    impliedVolatility: 20,
+    type: OptionType.Call,
+    underlyingPrice: 45
   };
 });
 

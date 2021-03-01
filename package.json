@@ -8,10 +8,12 @@
     "build": "tsc && copyfiles -u 2 src/graphql/*.graphql dist/graphql/",
     "start:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
     "graphql-codegen": "graphql-codegen --config graphql-codegen.yml",
-    "docker-build:dev": "docker build -t optionally-server --build-arg mode=development .",
-    "docker-build:prod": "docker build -t optionally-server --build-arg mode=production .",
+    "docker-build:dev": "docker build -t optionally-server:latest-dev --build-arg mode=development .",
+    "docker-build:prod": "docker build -t optionally-server:latest --build-arg mode=production .",
     "docker-run:dev": "docker run -dp 3000:3000 optionally-server",
-    "docker-run:prod": "docker run -dp 80:3000 optionally-server"
+    "docker-run:prod": "docker run -dp 80:3000 optionally-server",
+    "ecr-tag:prod": "docker tag optionally-server:latest 407247772095.dkr.ecr.us-east-1.amazonaws.com/optionally-server:latest",
+    "ecr-push": "docker push 407247772095.dkr.ecr.us-east-1.amazonaws.com/optionally-server:latest"
   },
   "repository": {
     "type": "git",

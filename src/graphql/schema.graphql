@@ -22,7 +22,6 @@ type Option implements Tradable {
   type: OptionType!
   underlyingSymbol: String!
   underlyingPrice: Float!
-  impliedVolatility: Float!
 }
 
 type OptionsForExpiry {

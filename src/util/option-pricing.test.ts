@@ -1,6 +1,7 @@
-import moment from 'moment';
-import { OptionInput, OptionType } from '../graphql/types';
+import moment from 'moment-timezone';
+import { OptionType } from '../graphql/types';
 import * as optionPricing from './option-pricing';
+import { OptionInputWithIV } from './option-pricing';
 
 describe('calculateApproximateRiskFreeInterestRate', function () {
 it('adds its inputs', function () {
@@ -13,14 +14,15 @@ it('adds its inputs', function () {
 describe('calculateOptionPriceForDates', function() {
   describe('with valid option input', function () {    
     it('returns empty array when dates input is empty', function () {
-      const option: OptionInput = {
+      const option: OptionInputWithIV = {
         underlyingPrice: 40,
         currentPrice: 30,
         expiry: '2025-01-01',
         strike: 34,
         type: OptionType.Call,
         quantity: 1,
-        underlyingSymbol: ''
+        underlyingSymbol: '',
+        impliedVolatility: 1
       };
       const riskFreeRate = 0.1;
 
@@ -30,17 +32,18 @@ describe('calculateOptionPriceForDates', function() {
     });
 
     it('returns array of same length as dates input', function () {
-      const option: OptionInput = {
+      const option: OptionInputWithIV = {
         underlyingPrice: 40,
         currentPrice: 30,
         expiry: '2025-01-01',
         strike: 34,
         type: OptionType.Call,
         quantity: 1,
-        underlyingSymbol: ''
+        underlyingSymbol: '',
+        impliedVolatility: 1
       };
       const riskFreeRate = 0.1;
-      const nowMoment = moment();
+      const nowMoment = moment.tz();
       
       const resultFor3Dates = optionPricing.calculateOptionPriceForDates(option, riskFreeRate, Array(3).fill(nowMoment));
       const resultFor10Dates = optionPricing.calculateOptionPriceForDates(option, riskFreeRate, Array(10).fill(nowMoment));

@@ -1,7 +1,7 @@
 import moment, { Moment } from 'moment-timezone';
 import IEconApi from '../data-source/econ-api/IEconApi';
 import { CalculatorInput, OptionInput, ReturnsTable, StrategyType } from "../graphql/types";
-import { calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates, calculateApproximateImpliedVolatility, OptionInputWithIV } from './option-pricing';
+import { calculateApproximateImpliedVolatility, calculateApproximateRiskFreeInterestRate, calculateOptionPriceForDates, OptionInputWithIV } from './option-pricing';
 import { GQLSafeNumber } from "./types";
 
 /**
@@ -192,7 +192,6 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
  * Produces theorerical profit or loss on option strategy given a date and asset price.
  * @param input Calculator input.
  * @param econApi IEconApi implementation.
- * @param ivApi TODO: remove
  * @returns Matrix of profit or loss by underlying price and date.
  */
 export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi): Promise<ReturnsTable> {

@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "jest",
-    "build": "tsc && copyfiles -u 2 src/graphql/*.graphql dist/graphql/",
+    "build": "tsc && copyfiles -u 2 src/graphql/*.graphql dist/graphql && copyfiles .env dist",
     "start:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
     "graphql-codegen": "graphql-codegen --config graphql-codegen.yml",
     "docker-build:dev": "docker build -t optionally-server:latest-dev --build-arg mode=development .",

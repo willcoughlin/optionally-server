@@ -353,5 +353,23 @@ function getDatesForReturnMatrix(expiry: string) {
  * @returns Array of possible asset prices (descending).
  */
 function getPricesForReturnMatrix(underlyingPrice: number, optionLegs: OptionInput[]) {
-  return [5, 4.75, 4.5, 4.25, 4, 3.75, 3.5, 3.25, 3];
+  const daysToExpiry = moment.tz(optionLegs[0].expiry, 'America/New_York').diff(moment.tz('America/New_York'), 'd');  
+  const dPct = 0.05 * Math.log10(1 + daysToExpiry);
+  const minValueOfInterest = Math.min(underlyingPrice, optionLegs[0].strike);
+  const maxValueOfInterest = Math.max(underlyingPrice, optionLegs[0].strike);
+  const maxPriceToReturn = Math.ceil(maxValueOfInterest + (dPct * underlyingPrice));
+  const minPriceToReturn = Math.max(0, Math.floor(minValueOfInterest - (dPct * underlyingPrice)));
+  const range = maxPriceToReturn - minPriceToReturn;
+  
+  let interval = 0.5;
+  while (range / interval > 30) {
+    interval += 0.5;
+  }
+
+  const result = [];
+  for (let i = maxPriceToReturn; i >= minPriceToReturn; i -= interval) {
+    result.push(i);
+  }
+
+  return result;
 }

@@ -220,8 +220,9 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
   for (let price of pricesToReturn) {
     const optionPricesToAdd = new Array<Array<number>>();
     for (let optionLegWithIv of optionLegsWithIV) {
-      optionPricesToAdd.push(calculateOptionPriceForDates({ ...optionLegWithIv, underlyingPrice: price }, 
-        riskFreeInterestRate, datesToReturn));
+      optionPricesToAdd.push(
+        calculateOptionPriceForDates({ ...optionLegWithIv, underlyingPrice: price }, riskFreeInterestRate, datesToReturn)
+          .map(price => price * optionLegWithIv.quantity * 100));
     }
     
     const matrixRowForPrice = optionPricesToAdd[0].map((_, i) => optionPricesToAdd.map(row => row[i]).reduce((sum, num) => sum + num));

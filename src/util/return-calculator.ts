@@ -205,7 +205,7 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
   if (!optionLegs.every(leg => leg.expiry === expiry)) throw new Error('Strategies with varying expiries not supported');
   
   const datesToReturn = getDatesForReturnMatrix(expiry);
-  const pricesToReturn = getPricesForReturnMatrix(0, optionLegs);
+  const pricesToReturn = getPricesForReturnMatrix(optionLegs[0].underlyingPrice, optionLegs);
   
   const inflationRate = await econApi.getInflationRate();
   const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
@@ -361,9 +361,9 @@ function getPricesForReturnMatrix(underlyingPrice: number, optionLegs: OptionInp
   const minPriceToReturn = Math.max(0, Math.floor(minValueOfInterest - (dPct * underlyingPrice)));
   const range = maxPriceToReturn - minPriceToReturn;
   
-  let interval = 0.5;
+  let interval = 0.05;
   while (range / interval > 30) {
-    interval += 0.5;
+    interval += 0.05;
   }
 
   const result = [];

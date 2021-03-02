@@ -11,7 +11,6 @@ beforeEach(function() {
     strike: 50,
     type: OptionType.Call,
     underlyingPrice: 45,
-    underlyingSymbol: ''
   };
 });
 

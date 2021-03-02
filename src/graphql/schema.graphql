@@ -85,7 +85,6 @@ input OptionInput {
   strike: Float!,
   expiry: String!
   underlyingPrice: Float!,
-  underlyingSymbol: String!,
   type: OptionType!
 }
 

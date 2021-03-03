@@ -209,10 +209,16 @@ export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEc
   const tBillRate = await econApi.getNearestTBillRate(moment(expiry));
   const riskFreeInterestRate = calculateApproximateRiskFreeInterestRate(tBillRate, inflationRate);
 
-  const optionLegsWithIV: OptionInputWithIV[] = optionLegs.map(leg => ({
-    ...leg,
-    impliedVolatility: calculateApproximateImpliedVolatility(leg, riskFreeInterestRate)
-  }));
+  // Save IV result from each calculation to use as starting point for subsequent calls
+  let ivStartValue: number;
+  const optionLegsWithIV: OptionInputWithIV[] = optionLegs.map(leg => {
+    const iv = calculateApproximateImpliedVolatility(leg, riskFreeInterestRate, ivStartValue);
+    ivStartValue = iv;
+    return {
+      ...leg,
+      impliedVolatility: iv
+    }
+  });
 
   const matrix = Array<Array<number>>();
   for (let price of pricesToReturn) {

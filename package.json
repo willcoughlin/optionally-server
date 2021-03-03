@@ -6,14 +6,13 @@
   "scripts": {
     "test": "jest",
     "build": "tsc && copyfiles -u 2 src/graphql/*.graphql dist/graphql && copyfiles .env dist",
-    "start:dev": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
+    "start": "nodemon \"src/server.ts\" --exec \"ts-node\" src/server.ts -e ts,graphql",
     "graphql-codegen": "graphql-codegen --config graphql-codegen.yml",
     "docker-login": "aws ecr get-login-password | docker login --username AWS --password-stdin 407247772095.dkr.ecr.us-east-1.amazonaws.com",
-    "docker-build:dev": "docker build -t optionally-server:latest --build-arg mode=development .",
+    "docker-build": "docker build -t optionally-server:latest --build-arg mode=development .",
     "docker-build:prod": "docker build -t optionally-server:latest --build-arg mode=production .",
-    "docker-run:dev": "docker run -dp 3000:3000 optionally-server",
-    "ecr-tag:prod": "docker tag optionally-server:latest 407247772095.dkr.ecr.us-east-1.amazonaws.com/optionally-server:latest",
-    "ecr-push:prod": "docker push 407247772095.dkr.ecr.us-east-1.amazonaws.com/optionally-server:latest"
+    "build-and-push": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./BuildAndPush.ps1",
+    "docker-run": "docker run -dp 3000:3000 optionally-server"
   },
   "repository": {
     "type": "git",

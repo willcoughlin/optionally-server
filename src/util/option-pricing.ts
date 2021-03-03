@@ -26,7 +26,7 @@ export function calculateOptionPriceForDates(option: OptionInputWithIV, riskFree
 export function calculateApproximateImpliedVolatility(option: OptionInput, riskFreeInterestRate: number, startValue?: number) {
   const t = moment(option.expiry).diff(moment(), 'y', true);
   const calcPrice = (iv: number) => bs.blackScholes(option.underlyingPrice, option.strike, t, iv, riskFreeInterestRate / 100, 
-    OptionType.Call ? 'call' : 'put');
+    option.type === OptionType.Call ? 'call' : 'put');
   
     const precision = 0.05;
     const actualPrice = option.currentPrice;

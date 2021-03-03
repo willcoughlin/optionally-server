@@ -22,6 +22,7 @@ app.get('/', (_, res) => res.sendStatus(200));
 // Create Apollo server
 const server = new ApolloServer({
   schema,
+  playground: true,
   validationRules: [depthLimit(7)],
   dataSources: () => ({ 
     autocompleteApi: new YahooAutocompleteApi(),

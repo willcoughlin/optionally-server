@@ -343,7 +343,7 @@ function getDatesForReturnMatrix(expiry: string) {
   }
   // Fill array
   const datesToReturn = new Array<Moment>();
-  for (let i = 0; i < daysToExpiry; i += interval) {
+  for (let i = 0; i <= daysToExpiry; i += interval) {
     datesToReturn.push(moment.tz(tz).add(i, 'd'));
   }
 

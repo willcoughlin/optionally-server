@@ -16,6 +16,9 @@ const app = express();
 app.use('*', cors());
 app.use(compression());
 
+// Health check
+app.get('/', (_, res) => res.sendStatus(200));
+
 // Create Apollo server
 const server = new ApolloServer({
   schema,

@@ -5,8 +5,8 @@ import { OptionInputWithIV } from './option-pricing';
 
 describe('calculateApproximateRiskFreeInterestRate', function () {
 it('adds its inputs', function () {
-    expect(optionPricing.calculateApproximateRiskFreeInterestRate(1, 1)).toBe(2);
-    expect(optionPricing.calculateApproximateRiskFreeInterestRate(0.1, 0.01)).toBe(0.11);
+    expect(optionPricing.calculateApproximateRiskFreeInterestRate(1, 1)).toBe(0.02);
+    expect(optionPricing.calculateApproximateRiskFreeInterestRate(0.1, 0.01)).toBe(0.0011);
     expect(optionPricing.calculateApproximateRiskFreeInterestRate(-0.01, 0.01)).toBe(0);
   });
 });

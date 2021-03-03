@@ -37,7 +37,7 @@ export default class QuandlEconApi extends RESTDataSource implements IEconApi {
     }
 
     // Get rate
-    return (datasetResponse.dataset.data as QuandlTBillData)[0][nearestMaturityIdx] as number;
+    return ((datasetResponse.dataset.data as QuandlTBillData)[0][nearestMaturityIdx] as number) / 100;
   }
 
   /**
@@ -57,6 +57,6 @@ export default class QuandlEconApi extends RESTDataSource implements IEconApi {
     }
 
     // Get rate
-    return (datasetResponse.dataset.data as QuandlInflationData)[0][1];
+    return (datasetResponse.dataset.data as QuandlInflationData)[0][1] / 100;
   }
 }

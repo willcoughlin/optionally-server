@@ -195,7 +195,6 @@ export function calculateBreakevenAtExpiry(input: CalculatorInput) {
  * @returns Matrix of profit or loss by underlying price and date.
  */
 export async function calculateReturnMatrix(input: CalculatorInput, econApi: IEconApi): Promise<ReturnsTable> {
-
   const optionLegs = selectLegsBasedOnStrategy(input);  
   if (optionLegs.length === 0) throw new Error('Cannot calculate returns for zero-leg strategy');
   

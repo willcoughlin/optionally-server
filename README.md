@@ -1,3 +1,4 @@
+![OptionAlly](./assets/horizontal-purple-transparent-cover.png)
 # OptionAlly Server
 ![test workflow badge](https://github.com/willcoughlin/optionally-server/workflows/Tests/badge.svg)
 
@@ -44,15 +45,15 @@ npm run test
 
 
 ## Technologies
-<div style="display: flex; justify-content: space-evenly">
-  <a href="https://www.typescriptlang.org/">
-    <img src="./assets/ts-logo-128.svg" width="64" alt="TypeScript Logo">
+<p align="center">
+  <a href="https://www.typescriptlang.org/" style="margin-right: 15%">
+    <img src="./assets/ts-logo-128.svg" width="20%" alt="TypeScript Logo">
   </a>
-  <a href="https://graphql.org/">
-    <img src="./assets/GraphQL_Logo.svg" width="64" alt="GraphQL Logo">
+  <a href="https://graphql.org/" style="margin-right: 15%">
+    <img src="./assets/GraphQL_Logo.svg" width="20%" alt="GraphQL Logo">
   </a>
   <a href="https://nodejs.org/en/">
-    <img src="./assets/node-js-brands.svg" width="64" alt="Node.js Logo">
+    <img src="./assets/node-js-brands.svg" width="17%" alt="Node.js Logo">
   </a>
 </div>
 

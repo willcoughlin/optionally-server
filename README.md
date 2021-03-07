@@ -18,6 +18,7 @@ After cloning this repo, here's how to get up and running locally.
 #### 1. Configure environment
 You will need to sign up for a free [Quandl dev account and create and API key](https://docs.quandl.com/docs#section-authentication). After you have an API key, create a file in the root of the project called *.env* and add your key as shown below:
 ```
+YAHOO_BASEURL=http://d.yimg.com/autoc.finance.yahoo.com/
 OPC_BASEURL=https://www.optionsprofitcalculator.com/ajax/
 QUANDL_BASEURL=https://www.quandl.com/api/v3/datasets/
 QUANDL_APIKEY=<YOUR API KEY>
@@ -31,7 +32,7 @@ npm install
 ```
 #### 3. Run local dev server
 ```sh
-npm run start:dev
+npm run start
 ```
 
 ### Tests
@@ -59,12 +60,18 @@ OptionAlly Server is built with:
 - [TypeScript](https://www.typescriptlang.org/)
 - [GraphQL](https://graphql.org/) + [Apollo Server](https://www.apollographql.com/docs/apollo-server/)
 - [Node.js](https://nodejs.org/en/) + [Express](https://expressjs.com/)
+
+With special thanks to:
+- [Quandl](https://www.quandl.com/)
+- [Yahoo Finance](https://finance.yahoo.com/)
+- [OptionsProfitCalculator](https://www.optionsprofitcalculator.com/)
   
 ## Schema
 See below for an abridged version of the GraphQL schema. You can view the full version at [/src/graphql/schema.graphql](/src/graphql/schema.graphql).
 ### Queries
 ```graphql
 type Query {
+  lookup(query: String!): [LookupResult]!
   stock(symbol: String!): Stock!
   calculateReturns(input: CalculatorInput!) : CalculatorResult!
 }
@@ -89,7 +96,6 @@ type Option implements Tradable {
   type: OptionType!  # CALL or PUT
   underlyingSymbol: String!
   underlyingPrice: Float!
-  impliedVolatility: Float!
 }
 
 type OptionsForExpiry {
@@ -99,11 +105,23 @@ type OptionsForExpiry {
 }
 
 type CalculatorResult {
-  entryCost: Float!,
+  entryCost: Float!
   maxRisk: Float 
-  maxReturn: Float
-  breakEvenAtExpiry: Float!,
-  returnsTable: [ReturnsForDateByStrike!]!
+  maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
+  breakEvenAtExpiry: [Float!]!  # 1 for directional, 2 for delta-neutral
+  returnsTable: ReturnsTable!
+}
+
+type ReturnsTable {
+  dates: [String!]!
+  underlyingPrices: [Float!]!
+  dataMatrix: [[Float!]!]!
+}
+
+type LookupResult {
+  symbol: String!
+  name: String!
+  exchange: String!
 }
 
 input CalculatorInput {
@@ -113,10 +131,57 @@ input CalculatorInput {
   shortCall: OptionInput,
   shortPut: OptionInput
 }
+
+input OptionInput {
+  quantity: Int!,
+  currentPrice: Float!,
+  strike: Float!,
+  expiry: String!
+  underlyingPrice: Float!,
+  type: OptionType!
+}
 ```
 
 ## Examples
 Now that we've seen the schema, let's see some queries in action.
+
+### Search symbols matching "GM"
+Request:
+```graphql
+{
+  lookup(query: "gm") {
+    symbol
+    name
+    exchange
+  }
+}
+```
+
+Response: 
+```json
+{
+  "data": {
+    "lookup": [
+      {
+        "symbol": "GM",
+        "name": "General Motors Company",
+        "exchange": "NYSE"
+      },
+      {
+        "symbol": "GMVD",
+        "name": "G Medical Innovations Holdings Ltd.",
+        "exchange": "NASDAQ"
+      },
+      {
+        "symbol": "GMIIU",
+        "name": "Gores Metropoulos II, Inc.",
+        "exchange": "NASDAQ"
+      },
+      ...
+    ]
+  }
+}
+```
 
 ### Get price data for $SPY
 Request:
@@ -198,6 +263,50 @@ Response:
 }
 ```
 
+### Calculate max profit or loss and breakeven points from long strangle:
+Request:
+```graphql
+{
+  calculateReturns(input: {
+    strategy: STRADDLE_STRANGLE,
+    longCall: {
+      quantity: 1,
+      currentPrice: 1.40,
+      strike: 50,
+      expiry: "2021-03-19"
+    }
+    longPut: {
+      quantity: 1,
+      currentPrice: 1.55,
+      strike: 43.5
+      expiry: "2021-03-19"
+    }
+  }) {
+    entryCost
+    maxRisk
+    maxReturn
+    breakEvenAtExpiry
+  }
+}
+```
+
+Response:
+```json
+{
+  "data": {
+    "calculateReturns": {
+      "entryCost": 295,
+      "maxRisk": 295,
+      "maxReturn": null,
+      "breakEvenAtExpiry": [
+        51.4,
+        41.95
+      ]
+    }
+  }
+}
+```
+
 ## Source Code
 Let's run through the source code, shall we?
 ### [src/server.ts](src/server.ts)
@@ -205,6 +314,10 @@ Here is the application entry point. It contains configuration for the Apollo an
 
 ### [src/data-source](src/data-source)
 GraphQL resolver data sources. Each subdirectory contains an Interface and current Implementation(s).
+
+#### [src/data-source/autocomplete-api/IAutocompleteApi.ts](src/data-source/autocomplete-api/IAutocompleteApi.ts)
+Declares a method to power the mobile app's symbol autocomplete:
+- `findMatches` for finding stock or ETF symbols that match the user's query.
 
 #### [src/data-source/econ-api/IEconApi.ts](src/data-source/econ-api/IEconApi.ts)
 Declares two macroeconomic data retrieval methods for option pricing:
@@ -237,8 +350,10 @@ General utlity modules.
 #### [src/util/option-pricing.ts](src/util/option-pricing.ts)
 Of note here is the function `calculateOptionPriceForDates`, used to calculate theoretical option prices on each date in a given list of dates. OptionAlly uses the Black-Scholes option pricing model.
 
+Herein also lies `calculateApproximateImpliedVolatility`, which we use to find the approximate IV of a contract. This function essentially binary searches while comparing the actual option price to the calculated Black-Scholes price.
+
 #### [src/util/return-calculator.ts](src/util/return-calculator.ts)
-This module provides functions that do the work of calculating the results of a CalclulatorInput, including max risk and max return.
+This module is home to most of the business logic. These functions do the work of producing the results for a given `CalculatorInput`, including generating the returns matrix, and calculating risk/reward. 
 
 ## Attributions
 * The TypeScript Logo is attributed to Microsoft, licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).

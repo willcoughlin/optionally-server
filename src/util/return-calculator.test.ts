@@ -1,4 +1,4 @@
-import { CalculatorInput, OptionInput, StrategyType } from '../graphql/types';
+import { CalculatorInput, OptionInput, OptionType, StrategyType } from '../graphql/types';
 import * as returnCalculator from './return-calculator';
 
 let testOption: OptionInput;
@@ -8,7 +8,9 @@ beforeEach(function() {
     currentPrice: 0.1,
     expiry: '2020-01-15',
     quantity: 1,
-    strike: 50
+    strike: 50,
+    type: OptionType.Call,
+    underlyingPrice: 45,
   };
 });
 
@@ -421,14 +423,15 @@ describe('calculateMaxRiskAndReturn', function () {
 });
 
 describe('calculateBreakevenAtExpiry', function () {
-  describe('with call strategy', function () {
+  describe('with long call strategy', function () {
     it('returns strike price plus contract price', function () {
       const calculatorInput: CalculatorInput = {
         strategy: StrategyType.Call,
         longCall: testOption
       };
       const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
-      expect(result).toEqual(50.1);
+      expect(result).toHaveLength(1)
+      expect(result).toContain(50.1);
     });
     it('throws error when call leg not defined', function () {
       const calculatorInput: CalculatorInput = { strategy: StrategyType.Call };
@@ -436,19 +439,74 @@ describe('calculateBreakevenAtExpiry', function () {
       expect(tryGetResult).toThrow();
     });
   });
-  describe('with put strategy', function () {
+  describe('with short call strategy', function () {
+    it('returns strike price minus contract price', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.Call,
+        shortCall: testOption
+      };
+      const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(result).toHaveLength(1)
+      expect(result).toContain(49.9);
+    });
+  });
+  describe('with long put strategy', function () {
     it('returns strike price minus contract price', function () {
       const calculatorInput: CalculatorInput = {
         strategy: StrategyType.Put,
         longPut: testOption
       };
       const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
-      expect(result).toEqual(49.9);
+      expect(result).toHaveLength(1);
+      expect(result).toContain(49.9);
     });
     it('throws error when put leg not defined', function () {
       const calculatorInput: CalculatorInput = { strategy: StrategyType.Put };
       const tryGetResult = () => returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
       expect(tryGetResult).toThrow();
+    });
+  });
+  describe('with short put strategy', function () {
+    it('returns strike price plus contract price', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.Put,
+        shortPut: testOption
+      };
+      const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(result).toHaveLength(1);
+      expect(result).toContain(50.1);
+    });
+  });
+  describe('with long straddle/strangle stategy', function () {
+    it('returns call strike plus contract price and put strike minus contract price', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.StraddleStrangle,
+        longCall: testOption,
+        longPut: testOption
+      };
+      const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(result).toHaveLength(2);
+      expect(result).toEqual([50.1, 49.9]);
+    });
+    it('throws error when put leg not defined', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.StraddleStrangle,
+        longCall: testOption
+      };
+      const tryGetResult = () => returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(tryGetResult).toThrow();
+    });
+  });
+  describe('with short straddle/strangle stategy', function () {
+    it('returns call strike minus contract price and put strike plus contract price', function () {
+      const calculatorInput: CalculatorInput = {
+        strategy: StrategyType.StraddleStrangle,
+        shortCall: testOption,
+        shortPut: testOption
+      };
+      const result = returnCalculator.calculateBreakevenAtExpiry(calculatorInput);
+      expect(result).toHaveLength(2);
+      expect(result).toEqual([49.9, 50.1]);
     });
   });
 });

@@ -6,6 +6,8 @@ import cors from 'cors';
 import express from 'express';
 import depthLimit from 'graphql-depth-limit';
 import { createServer } from 'http';
+import YahooAutocompleteApi from './data-source/autocomplete-api/yahoo/YahooAutocompleteApi';
+import QuandlEconApi from './data-source/econ-api/quandl/QuandlEconApi';
 import OPCStocksApi from './data-source/stocks-api/opc/OPCStocksApi';
 import schema from './graphql/schema';
 
@@ -14,11 +16,18 @@ const app = express();
 app.use('*', cors());
 app.use(compression());
 
+// Health check
+app.get('/', (_, res) => res.sendStatus(200));
+
 // Create Apollo server
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)],
-  dataSources: () => ({ stocksApi: new OPCStocksApi() })
+  dataSources: () => ({ 
+    autocompleteApi: new YahooAutocompleteApi(),
+    stocksApi: new OPCStocksApi(),
+    econApi: new QuandlEconApi(),
+  })
 }); 
 
 server.applyMiddleware({ app, path: '/graphql' }); 

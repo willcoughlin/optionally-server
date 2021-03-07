@@ -22,7 +22,6 @@ type Option implements Tradable {
   type: OptionType!
   underlyingSymbol: String!
   underlyingPrice: Float!
-  impliedVolatility: Float!
 }
 
 type OptionsForExpiry {
@@ -32,17 +31,23 @@ type OptionsForExpiry {
 }
 
 type CalculatorResult {
-  entryCost: Float!,
+  entryCost: Float!
   maxRisk: Float 
   maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
-  breakEvenAtExpiry: Float!,
-  returnsTable: [ReturnsForDateByStrike!]!
+  breakEvenAtExpiry: [Float!]!  # 1 breakeven for directional plays, 2 breakevens for delta-neutral
+  returnsTable: ReturnsTable!
 }
 
-type ReturnsForDateByStrike {
-  date: String!,
-  returnInDollars: Float!,
-  returnInPercent: Float!
+type ReturnsTable {
+  dates: [String!]!
+  underlyingPrices: [Float!]!
+  dataMatrix: [[Float!]!]!
+}
+
+type LookupResult {
+  symbol: String!
+  name: String!
+  exchange: String!
 }
 
 # Enums
@@ -79,10 +84,13 @@ input OptionInput {
   currentPrice: Float!,
   strike: Float!,
   expiry: String!
+  underlyingPrice: Float!,
+  type: OptionType!
 }
 
 # Queries
 type Query {
+  lookup(query: String!): [LookupResult]!
   stock(symbol: String!): Stock!
   calculateReturns(input: CalculatorInput!) : CalculatorResult!
 }

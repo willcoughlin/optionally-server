@@ -32,7 +32,7 @@ npm install
 ```
 #### 3. Run local dev server
 ```sh
-npm run start:dev
+npm run start
 ```
 
 ### Tests
@@ -60,7 +60,7 @@ OptionAlly Server is built with:
 - [TypeScript](https://www.typescriptlang.org/)
 - [GraphQL](https://graphql.org/) + [Apollo Server](https://www.apollographql.com/docs/apollo-server/)
 - [Node.js](https://nodejs.org/en/) + [Express](https://expressjs.com/)
-- 
+
 With special thanks to:
 - [Quandl](https://www.quandl.com/)
 - [Yahoo Finance](https://finance.yahoo.com/)
@@ -96,7 +96,6 @@ type Option implements Tradable {
   type: OptionType!  # CALL or PUT
   underlyingSymbol: String!
   underlyingPrice: Float!
-  impliedVolatility: Float!
 }
 
 type OptionsForExpiry {
@@ -106,11 +105,23 @@ type OptionsForExpiry {
 }
 
 type CalculatorResult {
-  entryCost: Float!,
+  entryCost: Float!
   maxRisk: Float 
-  maxReturn: Float
-  breakEvenAtExpiry: [Float!]!,
-  returnsTable: [ReturnsForDateByStrike!]!
+  maxReturn: Float  # null values for maxRisk/maxReturn indicate infinity
+  breakEvenAtExpiry: [Float!]!  # 1 for directional, 2 for delta-neutral
+  returnsTable: ReturnsTable!
+}
+
+type ReturnsTable {
+  dates: [String!]!
+  underlyingPrices: [Float!]!
+  dataMatrix: [[Float!]!]!
+}
+
+type LookupResult {
+  symbol: String!
+  name: String!
+  exchange: String!
 }
 
 input CalculatorInput {
@@ -121,10 +132,13 @@ input CalculatorInput {
   shortPut: OptionInput
 }
 
-type LookupResult {
-  symbol: String!
-  name: String!
-  exchange: String!
+input OptionInput {
+  quantity: Int!,
+  currentPrice: Float!,
+  strike: Float!,
+  expiry: String!
+  underlyingPrice: Float!,
+  type: OptionType!
 }
 ```
 
@@ -336,8 +350,10 @@ General utlity modules.
 #### [src/util/option-pricing.ts](src/util/option-pricing.ts)
 Of note here is the function `calculateOptionPriceForDates`, used to calculate theoretical option prices on each date in a given list of dates. OptionAlly uses the Black-Scholes option pricing model.
 
+Herein also lies `calculateApproximateImpliedVolatility`, which we use to find the approximate IV of a contract. This function essentially binary searches while comparing the actual option price to the calculated Black-Scholes price.
+
 #### [src/util/return-calculator.ts](src/util/return-calculator.ts)
-This module provides functions that do the work of calculating the results of a CalclulatorInput, including max risk and max return.
+This module is home to most of the business logic. These functions do the work of producing the results for a given `CalculatorInput`, including generating the returns matrix, and calculating risk/reward. 
 
 ## Attributions
 * The TypeScript Logo is attributed to Microsoft, licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
